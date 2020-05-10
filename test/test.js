@@ -59,7 +59,7 @@ test('entries', t => {
     const { store } = t.context
 
     // get entries as a plain object
-    const entries = Object.fromEntries(store.entries())
+    const entries = Array.from(store.entries())
     t.snapshot(entries)
 })
 
@@ -122,7 +122,7 @@ test('set', t => {
         t.is(store.size, i)
     }
 
-    const entries = Object.fromEntries(store.entries())
+    const entries = Array.from(store.entries())
 
     t.snapshot(entries)
 })

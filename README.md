@@ -40,7 +40,7 @@
 
 # NAME
 
-gm-storage - an ES6 Map [façade](https://en.wikipedia.org/wiki/Adapter_pattern) for the synchronous userscript storage API
+gm-storage - an ES6 Map [wrapper](https://en.wikipedia.org/wiki/Adapter_pattern) for the synchronous userscript storage API
 
 # FEATURES
 
