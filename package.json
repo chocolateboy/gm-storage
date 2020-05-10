@@ -1,0 +1,54 @@
+{
+    "name": "gm-storage",
+    "version": "0.0.1",
+    "description": "An ES6 Map façade for the synchronous userscript storage API",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "unpkg": "dist/index.umd.min.js",
+    "jsdelivr": "dist/index.umd.min.js",
+    "repository": "https://github.com/chocolateboy/gm-storage",
+    "author": "chocolateboy",
+    "license": "Artistic-2.0",
+    "scripts": {
+        "build": "bili --map --format cjs,esm -d dist src/index.ts",
+        "build:release": "cross-env NODE_ENV=production bili --no-map --module-name GMStorage --format cjs,esm,umd-min -d dist src/index.ts",
+        "clean": "shx rm -rf dist",
+        "doctoc": "markdown-toc --bullets=- -i README.md",
+        "prepublishOnly": "run-s clean doctoc typecheck build:release test:run",
+        "rebuild": "run-s clean build",
+        "test": "run-s typecheck build test:run",
+        "test:run": "ava --verbose --serial test/test.js",
+        "typecheck": "tsc --noEmit --noUnusedLocals --noUnusedParameters"
+    },
+    "files": [
+        "dist/index.js",
+        "dist/index.esm.js",
+        "dist/index.umd.min.js"
+    ],
+    "browserslist": "maintained node versions",
+    "devDependencies": {
+        "@babel/core": "^7.9.6",
+        "@types/tampermonkey": "^4.0.0",
+        "ava": "^3.8.2",
+        "babel-plugin-source-map-support": "^2.1.1",
+        "bili": "^4.10.0",
+        "cross-env": "^7.0.2",
+        "npm-run-all": "^4.1.5",
+        "rollup-plugin-typescript2": "^0.27.0",
+        "shx": "^0.3.2",
+        "typescript": "^3.8.3"
+    },
+    "keywords": [
+        "adapter",
+        "es6",
+        "es6-map",
+        "facade",
+        "greasemonkey",
+        "map",
+        "tampermonkey",
+        "userscript",
+        "userscripts",
+        "violentmonkey",
+        "wrapper"
+    ]
+}

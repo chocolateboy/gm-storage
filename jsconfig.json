@@ -1,0 +1,45 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "alwaysStrict": true,
+        "baseUrl": "./",
+        "declarationMap": false,
+        "declaration": true,
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "extendedDiagnostics": true,
+        "incremental": true,
+        "lib": [
+            "DOM",
+            "DOM.iterable",
+            "ES2015",
+            "ES2016",
+            "ES2017",
+            "ES2018",
+            "ESNext"
+        ],
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "newLine": "LF",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "outDir": "staging",
+        "removeComments": false,
+        "strict": true,
+        // "strictBindCallApply": true,
+        // "strictNullChecks": true,
+        // "strictPropertyInitialization": true,
+        "target": "ESNext",
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    },
+    "include": [
+        "src/**/*.*"
+    ]
+}
