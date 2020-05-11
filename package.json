@@ -6,6 +6,7 @@
     "module": "dist/index.esm.js",
     "unpkg": "dist/index.umd.min.js",
     "jsdelivr": "dist/index.umd.min.js",
+    "types": "dist/index.d.ts",
     "repository": "https://github.com/chocolateboy/gm-storage",
     "author": "chocolateboy",
     "license": "Artistic-2.0",
@@ -21,8 +22,9 @@
         "typecheck": "tsc --noEmit --noUnusedLocals --noUnusedParameters"
     },
     "files": [
-        "dist/index.js",
+        "dist/index.d.ts",
         "dist/index.esm.js",
+        "dist/index.js",
         "dist/index.umd.min.js"
     ],
     "browserslist": "maintained node versions",
