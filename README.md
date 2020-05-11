@@ -15,7 +15,7 @@
 - [EXPORTS](#exports)
   - [GMStorage (default)](#gmstorage-default)
     - [Options](#options)
-      - [verify](#verify)
+      - [check](#check)
     - [Methods](#methods)
       - [clear](#clear)
       - [delete](#delete)
@@ -116,7 +116,18 @@ It also adds some features that aren't available in the Map API, e.g.
 The following types are referenced in the descriptions below:
 
 ```typescript
+type Callback<T, V> = (
+    this: T | undefined,
+    value: V,
+    key: Key,
+    store: GMStorage<V>
+) => void;
+
 type Key = string;
+
+type Options = {
+    check?: boolean;
+}
 
 type Value =
     | undefined
@@ -126,13 +137,6 @@ type Value =
     | string
     | Array<Value>
     | { [key: Key]: Value };
-
-type Callback<T, V> = (
-    this: T | undefined,
-    value: V,
-    key: Key,
-    store: GMStorage<V>
-) => void;
 ```
 
 # EXPORTS
@@ -154,23 +158,22 @@ console.log(store.size) // 2
 
 ### Options
 
-The `GMStorage` constructor optionally takes an object with the following options:
+The `GMStorage` constructor optionally takes the following options:
 
-#### verify
+#### check
 
 **Type**: boolean, default: `true`
 
 ```javascript
 // don't need GM_deleteValue or GM_listValues
-const store = new GMStorage({ verify: false })
+const store = new GMStorage({ check: false })
 
 store.set('foo', 'bar')
 store.get('foo') // "bar"
 ```
 
-The following `GM_*` functions must be defined (i.e.
-[granted](https://wiki.greasespot.net/@grant)) in order to use *all* GMStorage
-methods:
+In order to use *all* GMStorage methods, the following `GM_*` functions must be
+defined (i.e. [granted](https://wiki.greasespot.net/@grant)):
 
   - `GM_deleteValue`
   - `GM_getValue`
@@ -178,7 +181,7 @@ methods:
   - `GM_setValue`
 
 If this option is true (as it is by default), the existence of these functions
-is verified when the store is created. If any of the functions are missing, an
+is checked when the store is created. If any of the functions are missing, an
 error is raised.
 
 If the option is false, they are not checked, and access to `GM_*` functions
