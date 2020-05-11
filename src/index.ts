@@ -77,9 +77,11 @@ class GMStorage<V = Value> {
     }
 
     public get (key: Key): V
-    public get<D> (key: Key, $default: D): V | D
+    public get <D>(key: Key, $default: D): V | D
     public get (...args: any[]) {
-        return args.length === 2 ? $GM_API.getValue!(args[0], args[1]) : $GM_API.getValue!(args[0])
+        return args.length === 2
+            ? $GM_API.getValue!(args[0], args[1])
+            : $GM_API.getValue!(args[0])
     }
 
     public has (key: Key): boolean {

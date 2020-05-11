@@ -6,8 +6,8 @@
 <!-- toc -->
 
 - [NAME](#name)
-- [FEATURES](#features)
 - [INSTALLATION](#installation)
+- [FEATURES](#features)
 - [USAGE](#usage)
 - [DESCRIPTION](#description)
   - [Why?](#why)
@@ -16,7 +16,7 @@
   - [GMStorage (default)](#gmstorage-default)
     - [Options](#options)
       - [verify](#verify)
-    - [Properties](#properties)
+    - [Methods](#methods)
       - [clear](#clear)
       - [delete](#delete)
       - [entries](#entries)
@@ -26,12 +26,15 @@
       - [keys](#keys)
       - [set](#set)
       - [values](#values)
+    - [Properties](#properties)
       - [size](#size)
       - [Symbol.iterator](#symboliterator)
 - [DEVELOPMENT](#development)
   - [NPM Scripts](#npm-scripts)
 - [COMPATIBILITY](#compatibility)
 - [SEE ALSO](#see-also)
+  - [Libraries](#libraries)
+  - [APIs](#apis)
 - [VERSION](#version)
 - [AUTHOR](#author)
 - [COPYRIGHT AND LICENSE](#copyright-and-license)
@@ -40,19 +43,21 @@
 
 # NAME
 
-gm-storage - an ES6 Map [wrapper](https://en.wikipedia.org/wiki/Adapter_pattern) for the synchronous userscript storage API
-
-# FEATURES
-
-- implements the full Map API with some helpful extras
-- small (~ 1.2 KB minified)
-- UMD builds for convenient userscript use
+gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 
 # INSTALLATION
 
 ```
 $ npm install gm-storage
 ```
+
+# FEATURES
+
+- implements the full Map API with some helpful extras
+- small (~ 1 KB minified)
+- no dependencies
+- fully typed (TypeScript)
+- UMD builds for convenient userscript use
 
 # USAGE
 
@@ -83,8 +88,6 @@ store.delete('alpha')               // true
 store.keys()                        // ["foo", "bar"]
 Array.from(store.values())          // ["bar", "quux"]
 Object.fromEntries(store.entries()) // { foo: "bar", baz: "quux" }
-
-// etc.
 ```
 
 # DESCRIPTION
@@ -98,25 +101,15 @@ userscript storage API supported by most userscript engines:
 - [USI](https://addons.mozilla.org/firefox/addon/userunified-script-injector/)
 - [Violentmonkey](https://violentmonkey.github.io/)
 
-The notable exceptions are [Greasemonkey 4]() and [FireMonkey](), which have
-moved exclusively to asynchronous APIs.
+The notable exceptions are [Greasemonkey 4](https://www.greasespot.net/2017/09/greasemonkey-4-for-script-authors.html)
+and [FireMonkey](https://github.com/erosman/support/issues/98), which have moved exclusively to asynchronous APIs.
 
 ## Why?
 
 It augments the built-in API with some useful enhancements such as iterating
-over [values](#values) and [entries](#entries), and [removing all
-values](#clear).
-
+over [values](#values) and [entries](#entries), and [removing all values](#clear).
 It also adds some features that aren't available in the Map API, e.g.
-[`get`](#get) takes an optional default value (the same as `GM_getValue`), and
-[`GMStorage.of`](#of) and [`GMStorage.from`](#from) can be used to initialise a
-GMStorage instance in a similar way to `Array.from`, a feature which is still
-in the [proposal stage](https://tc39.es/proposal-setmap-offrom/) for ES6 Map and Set.
-
-In addition, it can be passed around to functions and wrappers
-that expect a Map-like, which allows enhancements like [partitioning](#FIXME)
-to be bolted on without the decorator needing to be tailored to the quirks of
-a non-standartd API.
+[`get`](#get) takes an optional default value (the same as `GM_getValue`).
 
 # TYPES
 
@@ -161,29 +154,41 @@ console.log(store.size) // 2
 
 ### Options
 
+The `GMStorage` constructor optionally takes the following options:
+
 #### verify
 
 **Type**: boolean, default: `true`
 
-Four `GM_` functions must be defined (i.e. granted) in order to use *all* GMStorage methods:
+```javascript
+// don't need GM_deleteValue or GM_listValues
+const store = new GMStorage({ verify: false })
 
-  - GM_deleteValue
-  - GM_getValue
-  - GM_listValues
-  - GM_setValue
+store.set('foo', 'bar')
+store.get('foo') // "bar"
+```
 
-If this option is true (as it is by default), the existence of all four of
-these functions is verified when the store is created. If any of the functions
-are missing, an error is raised.
+The following `GM_*` functions must be defined (i.e.
+[granted](https://wiki.greasespot.net/@grant)) in order to use *all* GMStorage
+methods:
 
-If the option is false, they are not checked and `GM_` functions used by unused
-storage methods need not be granted.
+  - `GM_deleteValue`
+  - `GM_getValue`
+  - `GM_listValues`
+  - `GM_setValue`
 
-### Properties
+If this option is true (as it is by default), the existence of these functions
+is verified when the store is created. If any of the functions are missing, an
+error is raised.
+
+If the option is false, they are not checked, and access to `GM_*` functions
+required by unused storage methods need not be granted.
+
+### Methods
 
 #### clear
 
-**Type**: `clear() ⇒ void`
+**Type**: `clear() ⇒ void`<br />
 **Requires**: `GM_deleteValue`, `GM_listValues`
 
 ```javascript
@@ -200,7 +205,7 @@ Remove all entries from the store.
 
 #### delete
 
-**Type**: `delete(key: Key) ⇒ boolean`
+**Type**: `delete(key: Key) ⇒ boolean`<br />
 **Requires**: `GM_deleteValue`
 
 ```javascript
@@ -220,9 +225,9 @@ false otherwise.
 
 #### entries
 
-**Type**: `entries() ⇒ Iterable<[Key, V]>`
-**Requires**: `GM_getValue`, `GM_listValues`
-**Alias**: Symbol.iterator
+**Type**: `entries() ⇒ Iterable<[Key, V]>`<br />
+**Requires**: `GM_getValue`, `GM_listValues`<br />
+**Alias**: [`Symbol.iterator`](#symboliterator)
 
 ```javascript
 for (const [key, value] of store.entries()) {
@@ -234,7 +239,7 @@ Returns an iterable which yields each key/value pair from the store.
 
 #### forEach
 
-**Type**: `forEach<U> (callback: Callback<U, V>, thisArg?: U) ⇒ void`
+**Type**: `forEach<U> (callback: Callback<U, V>, thisArg?: U) ⇒ void`<br />
 **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
@@ -249,9 +254,8 @@ inside the callback.
 
 #### get
 
-**Type**: `get<D>(key: Key, defaultValue?: D) ⇒ V | D `
-**Requires**: `GM_getValue`
-**Alias**: Symbol.iterator
+**Type**: `get<D>(key: Key, defaultValue?: D) ⇒ V | D `<br />
+**Requires**: `GM_getValue`<br />
 
 ```javascript
 const maybeAge = store.get(name)
@@ -263,7 +267,7 @@ value (which is undefined by default) if it doesn't exist.
 
 #### has
 
-**Type**: `has(key: Key) ⇒ boolean`
+**Type**: `has(key: Key) ⇒ boolean`<br />
 **Requires**: `GM_getValue`
 
 ```javascript
@@ -272,11 +276,12 @@ if (!store.has(key)) {
 }
 ```
 
-Returns true if the supplied key exists in the store, false otherwise.
+Returns true if an entry with the supplied key exists in the store, false
+otherwise.
 
 #### keys
 
-**Type**: `keys() ⇒ Array<Key>`
+**Type**: `keys() ⇒ Array<Key>`<br />
 **Requires**: `GM_listValues`
 
 ```javascript
@@ -289,7 +294,7 @@ Returns the keys from the store as an array.
 
 #### set
 
-**Type**: `set(key: Key, value: V) ⇒ this`
+**Type**: `set(key: Key, value: V) ⇒ this`<br />
 **Requires**: `GM_setValue`
 
 ```javascript
@@ -297,29 +302,38 @@ store.set('foo', 'bar')
      .set('baz', 'quux')
 ```
 
-Add a value to the store corresdponding to the supplied key. Returns the `this`
+Add a value to the store corresponding to the supplied key. Returns the `this`
 value (i.e. the GMStorage instance the method was called on) for chaining.
 
 #### values
 
+**Type**: `values() ⇒ Iterable<V>`<br />
 **Requires**: `GM_getValue`, `GM_listValues`
 
 Returns an iterable collection of the store's values.
 
+### Properties
+
 #### size
 
-**Type**: `number`
+**Type**: `number`<br />
 **Requires**: `GM_listValues`
 
 ```javascript
 console.log(store.size)
 ```
 
-Returns the number of elements in the store.
+Returns the number of entries in the store.
 
 #### Symbol.iterator
 
-This is an alias for [entries](#entries).
+This is an alias for [`entries`](#entries):
+
+```javascript
+for (const [key, value] of store) {
+    process(key, value)
+}
+```
 
 # DEVELOPMENT
 
@@ -334,27 +348,30 @@ The following NPM scripts are available:
 - clean - remove the target directory and its contents
 - doctoc - regenerate this README's TOC
 - rebuild - remove the target directory and build the library in development mode
-- test:run - run the test suite
 - test - typecheck the source code and run the test suite
+- test:run - run the test suite
 - typecheck - typecheck the source code with `tsc`
 
 </details>
 
 # COMPATIBILITY
 
-- any userscript engine with support for the Greasemonkey 3 storage API (i.e.
-  every engine apart from Greasemonkey 4 (not supported) and FireMonkey (not
-  synchronous))
+- any userscript engine with support for the Greasemonkey 3 storage API
 - any browser with ES6 support (e.g. symbols and generators)
 
 # SEE ALSO
 
-- [ES6 Map API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
-- Greasemonkey 3 API:
-  - [GM_deleteValue](https://sourceforge.net/p/greasemonkey/wiki/GM_deleteValue/)
-  - [GM_getValue](https://sourceforge.net/p/greasemonkey/wiki/GM_getValue/)
-  - [GM_listValues](https://sourceforge.net/p/greasemonkey/wiki/GM_listValues/)
-  - [GM_setValue](https://sourceforge.net/p/greasemonkey/wiki/GM_setValue/)
+## Libraries
+
+- [Keyv](https://www.npmjs.com/package/keyv) - simple key-value storage with support for multiple backends
+
+## APIs
+
+- [GM_deleteValue](https://sourceforge.net/p/greasemonkey/wiki/GM_deleteValue/)
+- [GM_getValue](https://sourceforge.net/p/greasemonkey/wiki/GM_getValue/)
+- [GM_listValues](https://sourceforge.net/p/greasemonkey/wiki/GM_listValues/)
+- [GM_setValue](https://sourceforge.net/p/greasemonkey/wiki/GM_setValue/)
+- [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
 
 # VERSION
 
