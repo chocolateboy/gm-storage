@@ -154,7 +154,7 @@ console.log(store.size) // 2
 
 ### Options
 
-The `GMStorage` constructor optionally takes the following options:
+The `GMStorage` constructor optionally takes an object with the following options:
 
 #### verify
 
@@ -302,8 +302,8 @@ store.set('foo', 'bar')
      .set('baz', 'quux')
 ```
 
-Add a value to the store corresponding to the supplied key. Returns the `this`
-value (i.e. the GMStorage instance the method was called on) for chaining.
+Add a value to the store under the supplied key. Returns `this` (i.e. the
+GMStorage instance the method was called on) for chaining.
 
 #### values
 

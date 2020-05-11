@@ -19,10 +19,12 @@ test.beforeEach(t => {
     t.not(store, $store)
 
     for (let i = 1; i <= COUNT; ++i) {
+        const key = `key-${i}`
+        const value = `value-${i}`
         t.is(store.size, i - 1)
-        t.is(store.has(i), false)
-        store.set(i, i)
-        t.is(store.has(i), true)
+        t.is(store.has(key), false)
+        store.set(key, value)
+        t.is(store.has(key), true)
         t.is(store.size, i)
     }
 
@@ -43,13 +45,14 @@ test('delete', t => {
 
     t.is(store.size, COUNT)
 
-    for (let hit = COUNT; hit >= 1; --hit) {
-        const miss = hit * -1
+    for (let i = COUNT; i >= 1; --i) {
+        const notAKey = `no-such-key-${i}`
+        const key = `key-${i}`
 
-        t.is(store.size, hit)
-        t.is(store.delete(miss), false)
-        t.is(store.delete(hit), true)
-        t.is(store.size, hit - 1)
+        t.is(store.size, i)
+        t.is(store.delete(notAKey), false)
+        t.is(store.delete(key), true)
+        t.is(store.size, i - 1)
     }
 
     t.is(store.size, 0)
@@ -81,24 +84,27 @@ test('get', t => {
     const { store } = t.context
     const $default = Symbol('default')
 
-    for (let hit = 1; hit <= COUNT; ++hit) {
-        const miss = hit * -1
+    for (let i = 1; i <= COUNT; ++i) {
+        const notAKey = `no-such-key-${i}`
+        const key = `key-${i}`
+        const value = `value-${i}`
 
-        t.is(store.get(hit), hit)
-        t.is(store.get(miss), undefined)
-        t.is(store.get(hit, $default), hit)
-        t.is(store.get(miss, $default), $default)
+        t.is(store.get(key), value)
+        t.is(store.get(notAKey), undefined)
+        t.is(store.get(key, $default), value)
+        t.is(store.get(notAKey, $default), $default)
     }
 })
 
 test('has', t => {
     const { store } = t.context
 
-    for (let hit = 1; hit <= COUNT; ++hit) {
-        const miss = hit * -1
+    for (let i = 1; i <= COUNT; ++i) {
+        const key = `key-${i}`
+        const notAKey = `no-such-key-${i}`
 
-        t.is(store.has(hit), true)
-        t.is(store.has(miss), false)
+        t.is(store.has(key), true)
+        t.is(store.has(notAKey), false)
     }
 })
 
@@ -113,12 +119,15 @@ test('set', t => {
     store.clear()
 
     for (let i = 1; i <= COUNT; ++i) {
+        const key = `set-key-${i}`
+        const value = `set-value-${i}`
+
         t.is(store.size, i - 1)
-        t.is(store.get(i), undefined)
-        t.is(store.has(i), false)
-        t.is(store.set(i, i), store)
-        t.is(store.get(i), i)
-        t.is(store.has(i), true)
+        t.is(store.get(key), undefined)
+        t.is(store.has(key), false)
+        t.is(store.set(key, value), store)
+        t.is(store.get(key), value)
+        t.is(store.has(key), true)
         t.is(store.size, i)
     }
 
