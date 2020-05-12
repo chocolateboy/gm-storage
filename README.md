@@ -65,7 +65,7 @@ $ npm install gm-storage
 // ==UserScript==
 // @name     My Userscript
 // @include  https://www.example.com/*
-// @require  https://unpkg.com/gm-storage@0.0.1
+// @require  https://unpkg.com/gm-storage@0.1.0
 // @grant    GM_deleteValue
 // @grant    GM_getValue
 // @grant    GM_listValues
