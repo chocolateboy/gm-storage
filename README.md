@@ -85,7 +85,7 @@ store.get('gamma', 'default value') // "default value"
 store.delete('alpha')               // true
 
 // iterables
-store.keys()                        // ["foo", "bar"]
+store.keys()                        // ["foo", "baz"]
 Array.from(store.values())          // ["bar", "quux"]
 Object.fromEntries(store.entries()) // { foo: "bar", baz: "quux" }
 ```
@@ -378,7 +378,7 @@ The following NPM scripts are available:
 
 # VERSION
 
-0.0.1
+0.1.0
 
 # AUTHOR
 
