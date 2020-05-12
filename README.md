@@ -209,7 +209,7 @@ Remove all entries from the store.
 #### delete
 
 **Type**: `delete(key: Key) ⇒ boolean`<br />
-**Requires**: `GM_deleteValue`
+**Requires**: `GM_deleteValue`, `GM_getValue`
 
 ```javascript
 const store = new GMStorage()
