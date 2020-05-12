@@ -223,7 +223,7 @@ store.size           // 1
 store.has('foo')     // false
 ```
 
-Delete the specified entry from the store. Returns true of the entry existed,
+Delete the specified entry from the store. Returns true if the entry existed,
 false otherwise.
 
 #### entries
