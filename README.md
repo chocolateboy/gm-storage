@@ -10,7 +10,6 @@
 - [FEATURES](#features)
 - [USAGE](#usage)
 - [DESCRIPTION](#description)
-  - [Why?](#why)
 - [TYPES](#types)
 - [EXPORTS](#exports)
   - [GMStorage (default)](#gmstorage-default)
@@ -103,8 +102,6 @@ userscript storage API supported by most userscript engines:
 
 The notable exceptions are [Greasemonkey 4](https://www.greasespot.net/2017/09/greasemonkey-4-for-script-authors.html)
 and [FireMonkey](https://github.com/erosman/support/issues/98), which have moved exclusively to asynchronous APIs.
-
-## Why?
 
 It augments the built-in API with some useful enhancements such as iterating
 over [values](#values) and [entries](#entries), and [removing all values](#clear).
