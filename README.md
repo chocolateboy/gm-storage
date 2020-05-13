@@ -82,6 +82,7 @@ store.set('alpha', 'beta')
 store.get('foo')                    // "bar"
 store.get('gamma', 'default value') // "default value"
 store.delete('alpha')               // true
+store.size                          // 2
 
 // iterables
 store.keys()                        // ["foo", "baz"]
@@ -140,7 +141,7 @@ type Value =
 
 ## GMStorage (default)
 
-**Type**: `GMStorage<V = Value>(options?: Options)`
+**Type**: `new GMStorage<V = Value>(options?: Options)`
 
 ```javascript
 import GMStorage from 'gm-storage'
@@ -231,7 +232,7 @@ false otherwise.
 
 ```javascript
 for (const [key, value] of store.entries()) {
-    process(key, value)
+    console.log([key, value])
 }
 ```
 
@@ -239,12 +240,12 @@ Returns an iterable which yields each key/value pair from the store.
 
 #### forEach
 
-**Type**: `forEach<U> (callback: Callback<U, V>, thisArg?: U) ⇒ void`<br />
+**Type**: `forEach<U>(callback: Callback<U, V>, thisArg?: U) ⇒ void`<br />
 **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
 store.forEach((value, key) => {
-    console.log(`key: ${key}, value: ${value}`)
+    console.log([key, value])
 })
 ```
 
@@ -258,8 +259,8 @@ inside the callback.
 **Requires**: `GM_getValue`<br />
 
 ```javascript
-const maybeAge = store.get(name)
-const age = store.get(name, 42)
+const maybeAge = store.get('age')
+const age = store.get('age', 42)
 ```
 
 Returns the value corresponding to the supplied key, or the optional default
@@ -337,7 +338,7 @@ This is an alias for [`entries`](#entries):
 
 ```javascript
 for (const [key, value] of store) {
-    process(key, value)
+    console.log([key, value])
 }
 ```
 
