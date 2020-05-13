@@ -310,6 +310,12 @@ GMStorage instance the method was called on) for chaining.
 **Type**: `values() ⇒ Iterable<V>`<br />
 **Requires**: `GM_getValue`, `GM_listValues`
 
+```javascript
+for (const value of store.values()) {
+    console.log(value)
+}
+```
+
 Returns an iterable collection of the store's values.
 
 ### Properties
