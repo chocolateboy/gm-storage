@@ -13,8 +13,9 @@
 - [TYPES](#types)
 - [EXPORTS](#exports)
   - [GMStorage (default)](#gmstorage-default)
-    - [Options](#options)
-      - [check](#check)
+    - [Constructor](#constructor)
+      - [Options](#options)
+        - [check](#check)
     - [Methods](#methods)
       - [clear](#clear)
       - [delete](#delete)
@@ -113,6 +114,8 @@ It also adds some features that aren't available in the Map API, e.g.
 
 The following types are referenced in the descriptions below:
 
+<details>
+
 ```typescript
 type Callback<T, V> = (
     this: T | undefined,
@@ -137,9 +140,13 @@ type Value =
     | { [key: Key]: Value };
 ```
 
+</details>
+
 # EXPORTS
 
 ## GMStorage (default)
+
+### Constructor
 
 **Type**: `new GMStorage<V = Value>(options?: Options)`
 
@@ -154,11 +161,11 @@ store.set('foo', 'bar')
 console.log(store.size) // 2
 ```
 
-### Options
+#### Options
 
 The `GMStorage` constructor optionally takes the following options:
 
-#### check
+##### check
 
 **Type**: boolean, default: `true`
 
