@@ -15,7 +15,7 @@
   - [GMStorage (default)](#gmstorage-default)
     - [Constructor](#constructor)
       - [Options](#options)
-        - [check](#check)
+        - [strict](#strict)
     - [Methods](#methods)
       - [clear](#clear)
       - [delete](#delete)
@@ -127,7 +127,7 @@ type Callback<T, V> = (
 type Key = string;
 
 type Options = {
-    check?: boolean;
+    strict?: boolean;
 }
 
 type Value =
@@ -165,13 +165,13 @@ console.log(store.size) // 2
 
 The `GMStorage` constructor optionally takes the following options:
 
-##### check
+##### strict
 
 **Type**: boolean, default: `true`
 
 ```javascript
 // don't need GM_deleteValue or GM_listValues
-const store = new GMStorage({ check: false })
+const store = new GMStorage({ strict: false })
 
 store.set('foo', 'bar')
 store.get('foo') // "bar"

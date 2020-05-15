@@ -42,10 +42,8 @@
     },
     "keywords": [
         "adapter",
-        "adapter-pattern",
         "es6",
         "es6-map",
-        "facade",
         "greasemonkey",
         "map",
         "tampermonkey",

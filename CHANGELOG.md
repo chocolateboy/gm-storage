@@ -1,3 +1,7 @@
+## 0.2.0 - TBD
+
+- **breaking change**: rename options.check -> options.strict
+
 ## 0.1.1 - 2020-05-13
 
 - improve documentation

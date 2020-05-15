@@ -16,7 +16,7 @@ export type Callback<T, V> = (
 ) => void;
 
 export type Options = {
-    check?: boolean;
+    strict?: boolean;
 }
 
 const $GM_API = {
@@ -27,14 +27,14 @@ const $GM_API = {
 }
 
 const NOT_FOUND = Symbol()
-const OPTIONS = { check: true }
+const OPTIONS = { strict: true }
 
 class GMStorage<V = Value> {
     constructor (_options: Options = {}) {
         const options = Object.assign({}, OPTIONS, _options || {})
-        const { check } = options
+        const { strict } = options
 
-        if (check) {
+        if (strict) {
             for (const [key, value] of Object.entries($GM_API)) {
                 if (!value) {
                     throw new ReferenceError(`GM_${key} is not defined`)
