@@ -65,7 +65,7 @@ $ npm install gm-storage
 // ==UserScript==
 // @name     My Userscript
 // @include  https://www.example.com/*
-// @require  https://unpkg.com/gm-storage@0.1.1
+// @require  https://unpkg.com/gm-storage@0.2.0
 // @grant    GM_deleteValue
 // @grant    GM_getValue
 // @grant    GM_listValues
@@ -148,7 +148,7 @@ type Value =
 
 ### Constructor
 
-**Type**: `new GMStorage<V = Value>(options?: Options)`
+**Type**: `GMStorage<V = Value>(options?: Options)`
 
 ```javascript
 import GMStorage from 'gm-storage'
@@ -389,7 +389,7 @@ The following NPM scripts are available:
 
 # VERSION
 
-0.1.1
+0.2.0
 
 # AUTHOR
 
