@@ -1,5 +1,5 @@
-const test                 = require('ava')
-const { setStore, ...API } = require('./_util.js')
+const test                        = require('ava')
+const { setBackingStore, ...API } = require('./_util.js')
 
 Object.assign(global, API)
 
@@ -10,7 +10,7 @@ const COUNT = 10
 test.beforeEach(t => {
     const $store = new Map()
 
-    setStore($store)
+    setBackingStore($store)
 
     const store = new GMStorage()
 
@@ -61,8 +61,12 @@ test('delete', t => {
 test('entries', t => {
     const { store } = t.context
 
-    // get entries as a plain object
+    // XXX we'd like to dump the entries as a plain object (it's more readable
+    // in the (Markdown) snapshot), but `Object.fromEntries` isn't supported by
+    // Node.js v10, and it's not worth transpiling the tests for one method, so
+    // this will have to do for now
     const entries = Array.from(store.entries())
+
     t.snapshot(entries)
 })
 
