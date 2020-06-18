@@ -51,6 +51,7 @@ test('delete', t => {
 
         t.is(store.size, i)
         t.is(store.delete(notAKey), false)
+        t.is(store.size, i)
         t.is(store.delete(key), true)
         t.is(store.size, i - 1)
     }

@@ -30,7 +30,6 @@
       - [size](#size)
       - [Symbol.iterator](#symboliterator)
 - [DEVELOPMENT](#development)
-  - [NPM Scripts](#npm-scripts)
 - [COMPATIBILITY](#compatibility)
 - [SEE ALSO](#see-also)
   - [Libraries](#libraries)

@@ -15,7 +15,7 @@
         "build:release": "cross-env NODE_ENV=production bili --no-map --module-name GMStorage --format cjs,esm,umd-min -d dist src/index.ts",
         "clean": "shx rm -rf dist",
         "doctoc": "markdown-toc --bullets=- -i README.md",
-        "prepublishOnly": "run-s clean doctoc typecheck build:release test:run",
+        "prepublishOnly": "run-s clean typecheck build:release test:run",
         "rebuild": "run-s clean build",
         "test": "run-s typecheck build test:run",
         "test:run": "ava --verbose --serial test/test.js",
