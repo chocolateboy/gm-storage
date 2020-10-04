@@ -6,8 +6,8 @@
 <!-- toc -->
 
 - [NAME](#name)
-- [INSTALLATION](#installation)
 - [FEATURES](#features)
+- [INSTALLATION](#installation)
 - [USAGE](#usage)
 - [DESCRIPTION](#description)
 - [TYPES](#types)
@@ -44,12 +44,6 @@
 
 gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 
-# INSTALLATION
-
-```
-$ npm install gm-storage
-```
-
 # FEATURES
 
 - implements the full Map API with some helpful extras
@@ -57,6 +51,12 @@ $ npm install gm-storage
 - no dependencies
 - fully typed (TypeScript)
 - UMD builds for convenient userscript use
+
+# INSTALLATION
+
+```
+$ npm install gm-storage
+```
 
 # USAGE
 
