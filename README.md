@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/chocolateboy/gm-storage.svg)](https://travis-ci.org/chocolateboy/gm-storage)
 [![NPM Version](https://img.shields.io/npm/v/gm-storage.svg)](https://www.npmjs.org/package/gm-storage)
 
-<!-- toc -->
+<!-- TOC -->
 
 - [NAME](#name)
 - [FEATURES](#features)
@@ -38,7 +38,7 @@
 - [AUTHOR](#author)
 - [COPYRIGHT AND LICENSE](#copyright-and-license)
 
-<!-- tocstop -->
+<!-- TOC END -->
 
 # NAME
 
@@ -352,14 +352,15 @@ for (const [key, value] of store) {
 
 <details>
 
+<!-- TOC:ignore -->
 ## NPM Scripts
 
 The following NPM scripts are available:
 
 - build - compile the library in development mode and save it to the target directory
+- build:doc - regenerate this README's TOC
 - build:release - compile the library in production mode and save it to the target directory
 - clean - remove the target directory and its contents
-- doctoc - regenerate this README's TOC
 - rebuild - remove the target directory and build the library in development mode
 - test - typecheck the source code and run the test suite
 - test:run - run the test suite
