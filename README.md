@@ -94,20 +94,23 @@ Object.fromEntries(store.entries()) // { foo: "bar", baz: "quux" }
 
 GMStorage implements an ES6 Map-compatible wrapper
 ([adapter](https://en.wikipedia.org/wiki/Adapter_pattern)) for the synchronous
-userscript storage API supported by most userscript engines:
+userscript storage API.
+
+It augments the built-in API with some useful enhancements such as iterating
+over [values](#values) and [entries](#entries), and [removing all values](#clear).
+It also adds some features which aren't available in the Map API, e.g.
+[`get`](#get) takes an optional default value (the same as `GM_getValue`).
+
+The synchronous storage API is supported by most userscript engines:
 
 - Greasemonkey 3
 - Tampermonkey (closed source)
 - [USI](https://addons.mozilla.org/firefox/addon/userunified-script-injector/)
 - [Violentmonkey](https://violentmonkey.github.io/)
 
-The notable exceptions are [Greasemonkey 4](https://www.greasespot.net/2017/09/greasemonkey-4-for-script-authors.html)
-and [FireMonkey](https://github.com/erosman/support/issues/98), which have moved exclusively to asynchronous APIs.
-
-It augments the built-in API with some useful enhancements such as iterating
-over [values](#values) and [entries](#entries), and [removing all values](#clear).
-It also adds some features that aren't available in the Map API, e.g.
-[`get`](#get) takes an optional default value (the same as `GM_getValue`).
+The notable exceptions are [Greasemonkey 4](https://www.greasespot.net/2017/09/greasemonkey-4-for-script-authors.html),
+which has moved exclusively to asynchronous APIs, and FireMonkey,
+which doesn't fully support the synchronous storage API.
 
 # TYPES
 
