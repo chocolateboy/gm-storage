@@ -108,9 +108,9 @@ The synchronous storage API is supported by most userscript engines:
 - [USI](https://addons.mozilla.org/firefox/addon/userunified-script-injector/)
 - [Violentmonkey](https://violentmonkey.github.io/)
 
-The notable exceptions are [Greasemonkey 4](https://www.greasespot.net/2017/09/greasemonkey-4-for-script-authors.html),
-which has moved exclusively to asynchronous APIs, and FireMonkey,
-which doesn't fully support the synchronous storage API.
+The notable exceptions are [Greasemonkey 4](https://www.greasespot.net/2017/09/greasemonkey-4-for-script-authors.html)
+and [FireMonkey](https://github.com/erosman/support/issues/98), which have
+moved exclusively to the asynchronous API.
 
 # TYPES
 
