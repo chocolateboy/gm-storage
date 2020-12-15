@@ -1,6 +1,6 @@
 # gm-storage
 
-[![Build Status](https://travis-ci.org/chocolateboy/gm-storage.svg)](https://travis-ci.org/chocolateboy/gm-storage)
+[![Build Status](https://github.com/chocolateboy/gm-storage/workflows/test/badge.svg)](https://github.com/chocolateboy/gm-storage/actions?query=workflow%3Atest)
 [![NPM Version](https://img.shields.io/npm/v/gm-storage.svg)](https://www.npmjs.org/package/gm-storage)
 
 <!-- TOC -->
