@@ -9,7 +9,7 @@
     "types": "dist/index.d.ts",
     "repository": "https://github.com/chocolateboy/gm-storage",
     "author": "chocolateboy",
-    "license": "Artistic-2.0",
+    "license": "MIT",
     "scripts": {
         "build": "bili --map --format cjs -d dist src/index.ts",
         "build:doc": "toc-md README.md",
