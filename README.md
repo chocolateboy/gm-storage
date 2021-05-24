@@ -162,7 +162,7 @@ console.log(store.size) // 2
 
 Constructs a Map-compatible instance which associates strings with values in
 the userscript engine's storage. `GMStorage<V>` instances are compatible with
-`Map<string, V>`, where `V` is a subclass of (or defaults to) the type of
+`Map<string, V>`, where `V` extends (or defaults to) the type of
 JSON-serializable values.
 
 #### Options
