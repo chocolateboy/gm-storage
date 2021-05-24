@@ -171,7 +171,7 @@ The `GMStorage` constructor can take the following options:
 
 ##### strict
 
-- **Type**: boolean
+- **Type**: `boolean`
 - **Default**: `true`
 
 ```javascript
@@ -201,7 +201,7 @@ required by unused storage methods need not be granted.
 
 #### clear
 
-- **Type**: `clear() => void`
+- **Type**: `clear(): void`
 - **Requires**: `GM_deleteValue`, `GM_listValues`
 
 ```javascript
@@ -218,7 +218,7 @@ Remove all entries from the store.
 
 #### delete
 
-- **Type**: `delete(key: string) => boolean`<br />
+- **Type**: `delete(key: string): boolean`
 - **Requires**: `GM_deleteValue`, `GM_getValue`
 
 ```javascript
@@ -229,8 +229,8 @@ const store = new GMStorage()
 store.size           // 2
 store.delete('nope') // false
 store.delete('foo')  // true
-store.size           // 1
 store.has('foo')     // false
+store.size           // 1
 ```
 
 Delete the value with the specified key from the store. Returns true if the
@@ -238,8 +238,8 @@ value existed, false otherwise.
 
 #### entries
 
-- **Type**: `entries() => IterableIterator<[string, V]>`<br />
-- **Requires**: `GM_getValue`, `GM_listValues`<br />
+- **Type**: `entries(): IterableIterator<[string, V]>`
+- **Requires**: `GM_getValue`, `GM_listValues`
 - **Alias**: [`Symbol.iterator`](#symboliterator)
 
 ```javascript
@@ -252,7 +252,7 @@ Returns an iterable which yields each key/value pair from the store.
 
 #### forEach
 
-- **Type**: `forEach<U>(callback: Callback<V, U>, thisArg?: U) => void`<br />
+- **Type**: `forEach<U>(callback: Callback<V, U>, thisArg?: U): void`
 - **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
@@ -267,8 +267,8 @@ inside the callback.
 
 #### get
 
-- **Type**: `get<D>(key: string, defaultValue?: D) => V | D | undefined `<br />
-- **Requires**: `GM_getValue`<br />
+- **Type**: `get<D>(key: string, defaultValue?: D): V | D | undefined `
+- **Requires**: `GM_getValue`
 
 ```javascript
 const maybeAge = store.get('age')
@@ -280,7 +280,7 @@ Returns the value corresponding to the supplied key, or the default value
 
 #### has
 
-- **Type**: `has(key: string) => boolean`<br />
+- **Type**: `has(key: string): boolean`
 - **Requires**: `GM_getValue`
 
 ```javascript
@@ -294,7 +294,7 @@ otherwise.
 
 #### keys
 
-- **Type**: `keys() => IterableIterator<string>`<br />
+- **Type**: `keys(): IterableIterator<string>`
 - **Requires**: `GM_listValues`
 
 ```javascript
@@ -310,7 +310,7 @@ is *not* an array.
 
 #### set
 
-- **Type**: `set(key: string, value: V) => this`<br />
+- **Type**: `set(key: string, value: V): this`
 - **Requires**: `GM_setValue`
 
 ```javascript
@@ -323,7 +323,7 @@ GMStorage instance the method was called on) for chaining.
 
 #### values
 
-- **Type**: `values() => IterableIterator<V>`<br />
+- **Type**: `values(): IterableIterator<V>`
 - **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
@@ -338,7 +338,7 @@ Returns an iterable collection of the store's values.
 
 #### size
 
-- **Type**: `number`<br />
+- **Type**: `number`
 - **Requires**: `GM_listValues`
 
 ```javascript
@@ -380,8 +380,8 @@ The following NPM scripts are available:
 # COMPATIBILITY
 
 - any userscript engine with support for the Greasemonkey 3 storage API
-- any browser with ES6 support (e.g. symbols and generators)
-- the `GM_*` methods are accessed via
+- any browser with ES6 support
+- the `GM_*` functions are accessed via
   [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis),
   which may need to be polyfilled in older browsers
 
