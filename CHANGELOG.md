@@ -2,7 +2,7 @@
 
 ### Breaking Changes
 
-##### Types
+#### Types
 
 - compatibility with `Map<string, V>`
   - `GMStorage#keys` returns an iterable/iterator rather than an array
@@ -15,19 +15,19 @@
 - add test for options.strict
 - docs: update compatibility notice
 
-### 0.2.0 - 2020-05-16
+## 0.2.0 - 2020-05-16
 
 - **breaking change**: rename options.check -> options.strict
 
-### 0.1.1 - 2020-05-13
+## 0.1.1 - 2020-05-13
 
 - improve documentation
 
-### 0.1.0 - 2020-05-12
+## 0.1.0 - 2020-05-12
 
 - **breaking change**: rename options.verify -> options.check
 - test improvements
 
-### 0.0.1 - 2020-05-11
+## 0.0.1 - 2020-05-11
 
 - initial release
