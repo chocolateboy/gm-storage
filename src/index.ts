@@ -1,121 +1,117 @@
-export type Key = string;
+'use strict';
 
-export type Value =
-    | undefined
-    | null
-    | number
-    | string
-    | Array<Value>
-    | { [key: string]: Value };
-
-export type Callback<T, V> = (
-    this: (T | undefined),
+export type Callback<V extends Value, U> = (
+    this: (U | undefined),
     value: V,
-    key: Key,
+    key: string,
     store: GMStorage<V>
 ) => void;
 
 export type Options = {
     strict?: boolean;
-}
+};
 
-const $GM_API = {
-    deleteValue: GM_deleteValue,
-    getValue:    GM_getValue,
-    listValues:  GM_listValues,
-    setValue:    GM_setValue,
-}
+export type Value =
+    | null
+    | boolean
+    | number
+    | string
+    | Array<Value>
+    | { [key: string]: Value };
+
+// these are defined as globals in @types/tampermonkey
+// const: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions
+const GM_API_KEYS = <const>['GM_deleteValue', 'GM_getValue', 'GM_listValues', 'GM_setValue'];
 
 const NOT_FOUND = Symbol()
 const OPTIONS = { strict: true }
 
-class GMStorage<V = Value> {
-    constructor (_options: Options = {}) {
-        const options = Object.assign({}, OPTIONS, _options || {})
-        const { strict } = options
+// minification helper
+const $global = globalThis
 
-        if (strict) {
-            for (const [key, value] of Object.entries($GM_API)) {
-                if (!value) {
-                    throw new ReferenceError(`GM_${key} is not defined`)
-                }
+class GMStorage<V extends Value = Value> implements Map<string, V> {
+    constructor (options: Options = OPTIONS) {
+        if (!options.strict) {
+            return
+        }
 
-                if (typeof value !== 'function') {
-                    throw new TypeError(`GM_${key} is not a function`)
-                }
+        for (const key of GM_API_KEYS) {
+            const value = $global[key]
+
+            if (!value) {
+                throw new ReferenceError(`${key} is not defined`)
+            }
+
+            if (typeof value !== 'function') {
+                throw new TypeError(`${key} is not a function`)
             }
         }
     }
 
-    public clear () {
-        const { deleteValue } = $GM_API
+    private _keys (): Array<string> {
+        return $global.GM_listValues()
+    }
 
-        for (const key of this.keys()) {
-            deleteValue!(key)
+    public clear (): void {
+        for (const key of this._keys()) {
+            $global.GM_deleteValue(key)
         }
     }
 
-    public delete (key: Key) {
-        const deleted = this.has(key)
-        $GM_API.deleteValue!(key)
-        return deleted
+    public delete (key: string): boolean {
+        return this.has(key) && ($global.GM_deleteValue(key), true)
     }
 
-    public *entries (): Generator<[Key, V]> {
-        for (const key of this.keys()) {
-            const value = this.get(key)
+    public *entries (): IterableIterator<[string, V]> {
+        for (const key of this._keys()) {
+            const value = this.get(key) as V
             yield [key, value]
         }
     }
 
     // "The length property of the forEach method is 1."
     // https://www.ecma-international.org/ecma-262/6.0/#sec-map.prototype.foreach
-    public forEach<U> (callback: Callback<U, V>, $this?: U) {
+    public forEach<U> (callback: Callback<V, U>, $this?: U): void {
         for (const [key, value] of this.entries()) {
             callback.call($this, value, key, this)
         }
     }
 
-    public get (key: Key): V
-    public get <D>(key: Key, $default: D): V | D
-    public get (...args: any[]) {
-        return args.length === 2
-            ? $GM_API.getValue!(args[0], args[1])
-            : $GM_API.getValue!(args[0])
+    public get (key: string): V | undefined
+    public get <D>(key: string, $default: D): V | D
+    public get (key: string, $default?: any) {
+        return $global.GM_getValue(key, $default)
     }
 
-    public has (key: Key): boolean {
-        return $GM_API.getValue!(key, NOT_FOUND) !== NOT_FOUND
+    public has (key: string): boolean {
+        return $global.GM_getValue(key, NOT_FOUND) !== NOT_FOUND
     }
 
-    public keys (): Array<Key> {
-        return $GM_API.listValues!()
+    public *keys (): IterableIterator<string> {
+        yield* this._keys()
     }
 
-    public set (key: Key, value: V) {
-        $GM_API.setValue!(key, value)
+    public set (key: string, value: V): this {
+        $global.GM_setValue(key, value)
         return this
     }
 
-    public get size () {
-        return this.keys().length
+    public get size (): number {
+        return this._keys().length
     }
 
-    public *values () {
-        for (const key of this.keys()) {
-            yield this.get(key)
+    public *values (): IterableIterator<V> {
+        for (const key of this._keys()) {
+            yield this.get(key) as V
         }
     }
 }
 
 /* aliases */
 
-// XXX why is this necessary (in addition to the assignment)?
-//
-// https://stackoverflow.com/a/47648460
-// interface GMStorage<V = Value> {
-//     [Symbol.iterator]: GMStorage<V>['entries'];
-// }
+interface GMStorage<V extends Value = Value> extends Map<string, V> {
+    [Symbol.iterator]: GMStorage<V>['entries'];
+}
 
 Object.assign(GMStorage.prototype, {
     [Symbol.iterator]: GMStorage.prototype.entries,

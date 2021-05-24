@@ -1,26 +1,23 @@
-const test                        = require('ava')
-const { setBackingStore, ...API } = require('./_util.js')
+const test                      = require('ava')
+const { initBackingStore, API } = require('./_util.js')
+
+const COUNT = 10
+const GMStorage = require('..')
 
 Object.assign(global, API)
 
-const GMStorage = require('..') // must be loaded after the API has been defined
-
-const COUNT = 10
-
 test.beforeEach(t => {
-    const $store = new Map()
-
-    setBackingStore($store)
-
+    const backingStore = initBackingStore()
     const store = new GMStorage()
 
-    t.is($store.size, 0)
+    t.is(backingStore.size, 0)
     t.is(store.size, 0)
-    t.not(store, $store)
+    t.not(store, backingStore)
 
     for (let i = 1; i <= COUNT; ++i) {
         const key = `key-${i}`
         const value = `value-${i}`
+
         t.is(store.size, i - 1)
         t.is(store.has(key), false)
         store.set(key, value)
@@ -36,7 +33,11 @@ test('clear', t => {
     const { store } = t.context
 
     t.is(store.size, COUNT)
+    t.is(store.has('key-1'), true)
+
     store.clear()
+
+    t.is(store.has('key-1'), false)
     t.is(store.size, 0)
 })
 
@@ -115,7 +116,11 @@ test('has', t => {
 
 test('keys', t => {
     const { store } = t.context
-    t.snapshot(store.keys())
+    const keys = store.keys()
+
+    t.is(Array.isArray(keys), false) // no longer an array
+    t.assert(Symbol.iterator in keys)
+    t.snapshot(Array.from(keys))
 })
 
 test('set', t => {
@@ -160,4 +165,42 @@ test('size', t => {
 test('values', t => {
     const { store } = t.context
     t.snapshot(Array.from(store.values()))
+})
+
+test('options.strict', t => {
+    const oldGetValue = global.GM_getValue
+
+    t.assert(typeof oldGetValue === 'function')
+
+    try {
+        delete global.GM_getValue
+
+        t.is(global.GM_getValue, undefined)
+
+        t.notThrows(() => new GMStorage({ strict: false }))
+
+        t.throws(() => new GMStorage({ strict: true }), {
+            instanceOf: ReferenceError,
+            message: /GM_getValue is not defined/,
+        })
+
+        t.throws(() => new GMStorage(), {
+            instanceOf: ReferenceError,
+            message: /GM_getValue is not defined/,
+        })
+
+        global.GM_getValue = 42
+
+        t.throws(() => new GMStorage({ strict: true }), {
+            instanceOf: TypeError,
+            message: /GM_getValue is not a function/,
+        })
+
+        t.throws(() => new GMStorage(), {
+            instanceOf: TypeError,
+            message: /GM_getValue is not a function/,
+        })
+    } finally {
+        global.GM_getValue = oldGetValue
+    }
 })

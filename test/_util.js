@@ -17,14 +17,16 @@ function GM_setValue (key, value) {
     $store.set(String(key), value)
 }
 
-function setBackingStore (value) {
-    $store = value
+function initBackingStore (map = new Map()) {
+    return $store = map
 }
 
 module.exports = {
-    GM_deleteValue,
-    GM_getValue,
-    GM_listValues,
-    GM_setValue,
-    setBackingStore,
+    API: {
+        GM_deleteValue,
+        GM_getValue,
+        GM_listValues,
+        GM_setValue,
+    },
+    initBackingStore,
 }

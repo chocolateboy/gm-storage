@@ -47,10 +47,10 @@ gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 # FEATURES
 
 - implements the full Map API with some helpful extras
-- small (~ 1 KB minified)
 - no dependencies
+- &lt; 450 B minified + gzipped
 - fully typed (TypeScript)
-- UMD builds for convenient userscript use
+- CDN builds (UMD) - [jsDelivr][], [unpkg][]
 
 # INSTALLATION
 
@@ -85,14 +85,14 @@ store.delete('alpha')               // true
 store.size                          // 2
 
 // iterables
-store.keys()                        // ["foo", "baz"]
-Array.from(store.values())          // ["bar", "quux"]
+[...store.keys()]                   // ["foo", "baz"]
+[...store.values()]                 // ["bar", "quux"]
 Object.fromEntries(store.entries()) // { foo: "bar", baz: "quux" }
 ```
 
 # DESCRIPTION
 
-GMStorage implements an ES6 Map-compatible wrapper
+GMStorage implements an ES6 Map compatible wrapper
 ([adapter](https://en.wikipedia.org/wiki/Adapter_pattern)) for the synchronous
 userscript storage API.
 
@@ -103,10 +103,10 @@ It also adds some features which aren't available in the Map API, e.g.
 
 The synchronous storage API is supported by most userscript engines:
 
-- Greasemonkey 3
-- Tampermonkey (closed source)
-- [USI](https://addons.mozilla.org/firefox/addon/userunified-script-injector/)
 - [Violentmonkey](https://violentmonkey.github.io/)
+- Tampermonkey
+- [USI](https://addons.mozilla.org/firefox/addon/userunified-script-injector/)
+- Greasemonkey 3
 
 The notable exceptions are [Greasemonkey 4](https://www.greasespot.net/2017/09/greasemonkey-4-for-script-authors.html)
 and [FireMonkey](https://github.com/erosman/support/issues/98), which have
@@ -119,27 +119,24 @@ The following types are referenced in the descriptions below:
 <details>
 
 ```typescript
-type Callback<T, V> = (
-    this: T | undefined,
+type Callback<V extends Value, U> = (
+    this: (U | undefined),
     value: V,
-    key: Key,
+    key: string,
     store: GMStorage<V>
 ) => void;
 
-type Key = string;
-
-type Options = {
-    strict?: boolean;
-}
+type Options = { strict?: boolean };
 
 type Value =
-    | undefined
     | null
     | boolean
     | number
     | string
     | Array<Value>
-    | { [key: Key]: Value };
+    | { [key: string]: Value };
+
+class GMStorage<V extends Value = Value> implements Map<string, V> {}
 ```
 
 </details>
@@ -150,7 +147,7 @@ type Value =
 
 ### Constructor
 
-**Type**: `GMStorage<V = Value>(options?: Options)`
+- **Type**: `GMStorage<V extends Value = Value>(options?: Options)`
 
 ```javascript
 import GMStorage from 'gm-storage'
@@ -163,13 +160,19 @@ store.set('foo', 'bar')
 console.log(store.size) // 2
 ```
 
+Constructs a Map-compatible instance which associates strings with values in
+the userscript engine's storage. `GMStorage<V>` instances are compatible with
+`Map<string, V>`, where `V` is a subclass of (or defaults to) the type of
+JSON-serializable values.
+
 #### Options
 
-The `GMStorage` constructor optionally takes the following options:
+The `GMStorage` constructor can take the following options:
 
 ##### strict
 
-**Type**: boolean, default: `true`
+- **Type**: boolean
+- **Default**: `true`
 
 ```javascript
 // don't need GM_deleteValue or GM_listValues
@@ -189,7 +192,7 @@ defined (i.e. [granted](https://wiki.greasespot.net/@grant)):
 
 If this option is true (as it is by default), the existence of these functions
 is checked when the store is created. If any of the functions are missing, an
-error is raised.
+exception is thrown.
 
 If the option is false, they are not checked, and access to `GM_*` functions
 required by unused storage methods need not be granted.
@@ -198,8 +201,8 @@ required by unused storage methods need not be granted.
 
 #### clear
 
-**Type**: `clear() ⇒ void`<br />
-**Requires**: `GM_deleteValue`, `GM_listValues`
+- **Type**: `clear() => void`
+- **Requires**: `GM_deleteValue`, `GM_listValues`
 
 ```javascript
 const store = new GMStorage()
@@ -215,8 +218,8 @@ Remove all entries from the store.
 
 #### delete
 
-**Type**: `delete(key: Key) ⇒ boolean`<br />
-**Requires**: `GM_deleteValue`, `GM_getValue`
+- **Type**: `delete(key: string) => boolean`<br />
+- **Requires**: `GM_deleteValue`, `GM_getValue`
 
 ```javascript
 const store = new GMStorage()
@@ -230,14 +233,14 @@ store.size           // 1
 store.has('foo')     // false
 ```
 
-Delete the specified entry from the store. Returns true if the entry existed,
-false otherwise.
+Delete the value with the specified key from the store. Returns true if the
+value existed, false otherwise.
 
 #### entries
 
-**Type**: `entries() ⇒ Iterable<[Key, V]>`<br />
-**Requires**: `GM_getValue`, `GM_listValues`<br />
-**Alias**: [`Symbol.iterator`](#symboliterator)
+- **Type**: `entries() => IterableIterator<[string, V]>`<br />
+- **Requires**: `GM_getValue`, `GM_listValues`<br />
+- **Alias**: [`Symbol.iterator`](#symboliterator)
 
 ```javascript
 for (const [key, value] of store.entries()) {
@@ -249,8 +252,8 @@ Returns an iterable which yields each key/value pair from the store.
 
 #### forEach
 
-**Type**: `forEach<U>(callback: Callback<U, V>, thisArg?: U) ⇒ void`<br />
-**Requires**: `GM_getValue`, `GM_listValues`
+- **Type**: `forEach<U>(callback: Callback<V, U>, thisArg?: U) => void`<br />
+- **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
 store.forEach((value, key) => {
@@ -264,21 +267,21 @@ inside the callback.
 
 #### get
 
-**Type**: `get<D>(key: Key, defaultValue?: D) ⇒ V | D `<br />
-**Requires**: `GM_getValue`<br />
+- **Type**: `get<D>(key: string, defaultValue?: D) => V | D | undefined `<br />
+- **Requires**: `GM_getValue`<br />
 
 ```javascript
 const maybeAge = store.get('age')
 const age = store.get('age', 42)
 ```
 
-Returns the value corresponding to the supplied key, or the optional default
-value (which is undefined by default) if it doesn't exist.
+Returns the value corresponding to the supplied key, or the default value
+(which is undefined by default) if it doesn't exist.
 
 #### has
 
-**Type**: `has(key: Key) ⇒ boolean`<br />
-**Requires**: `GM_getValue`
+- **Type**: `has(key: string) => boolean`<br />
+- **Requires**: `GM_getValue`
 
 ```javascript
 if (!store.has(key)) {
@@ -286,13 +289,13 @@ if (!store.has(key)) {
 }
 ```
 
-Returns true if an entry with the supplied key exists in the store, false
+Returns true if a value with the supplied key exists in the store, false
 otherwise.
 
 #### keys
 
-**Type**: `keys() ⇒ Array<Key>`<br />
-**Requires**: `GM_listValues`
+- **Type**: `keys() => IterableIterator<string>`<br />
+- **Requires**: `GM_listValues`
 
 ```javascript
 for (const key of store.keys()) {
@@ -300,12 +303,15 @@ for (const key of store.keys()) {
 }
 ```
 
-Returns the keys from the store as an array.
+Returns an iterable collection of the store's keys.
+
+Note that, for compatibility with `Map#keys`, the return value is iterable but
+is *not* an array.
 
 #### set
 
-**Type**: `set(key: Key, value: V) ⇒ this`<br />
-**Requires**: `GM_setValue`
+- **Type**: `set(key: string, value: V) => this`<br />
+- **Requires**: `GM_setValue`
 
 ```javascript
 store.set('foo', 'bar')
@@ -317,8 +323,8 @@ GMStorage instance the method was called on) for chaining.
 
 #### values
 
-**Type**: `values() ⇒ Iterable<V>`<br />
-**Requires**: `GM_getValue`, `GM_listValues`
+- **Type**: `values() => IterableIterator<V>`<br />
+- **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
 for (const value of store.values()) {
@@ -332,18 +338,18 @@ Returns an iterable collection of the store's values.
 
 #### size
 
-**Type**: `number`<br />
-**Requires**: `GM_listValues`
+- **Type**: `number`<br />
+- **Requires**: `GM_listValues`
 
 ```javascript
 console.log(store.size)
 ```
 
-Returns the number of entries in the store.
+Returns the number of values in the store.
 
 #### Symbol.iterator
 
-This is an alias for [`entries`](#entries):
+An alias for [`entries`](#entries):
 
 ```javascript
 for (const [key, value] of store) {
@@ -360,14 +366,14 @@ for (const [key, value] of store) {
 
 The following NPM scripts are available:
 
-- build - compile the library in development mode and save it to the target directory
-- build:doc - regenerate this README's TOC
-- build:release - compile the library in production mode and save it to the target directory
+- build - compile the library for testing and save to the target directory
+- build:doc - generate the README's TOC (table of contents)
+- build:release - compile the library for release and save to the target directory
 - clean - remove the target directory and its contents
-- rebuild - remove the target directory and build the library in development mode
-- test - typecheck the source code and run the test suite
+- rebuild - clean the target directory and recompile the library
+- test - recompile the library and run the test suite
 - test:run - run the test suite
-- typecheck - typecheck the source code with `tsc`
+- typecheck - sanity check the library's type definitions
 
 </details>
 
@@ -375,6 +381,9 @@ The following NPM scripts are available:
 
 - any userscript engine with support for the Greasemonkey 3 storage API
 - any browser with ES6 support (e.g. symbols and generators)
+- the `GM_*` methods are accessed via
+  [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis),
+  which may need to be polyfilled in older browsers
 
 # SEE ALSO
 
@@ -404,3 +413,6 @@ Copyright © 2020-2021 by chocolateboy.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the [MIT license](https://opensource.org/licenses/MIT).
+
+[jsDelivr]: https://cdn.jsdelivr.net/npm/gm-storage@0.2.0/dist/index.umd.min.js
+[unpkg]: https://unpkg.com/gm-storage@0.2.0/dist/index.umd.min.js

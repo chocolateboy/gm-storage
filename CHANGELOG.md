@@ -1,6 +1,18 @@
-### 0.3.0 - TBD
+## 1.0.0 - TBD
+
+### Breaking Changes
+
+##### Types
+
+- compatibility with `Map<string, V>`
+  - `GMStorage#keys` returns an iterable/iterator rather than an array
+  - fix the type for stored values (JSON-serializable)
+- remove the `Key` alias for `string`
+
+### Changes
 
 - relicense: Artistic 2.0 -> MIT
+- add test for options.strict
 - docs: update compatibility notice
 
 ### 0.2.0 - 2020-05-16
