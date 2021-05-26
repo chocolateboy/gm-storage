@@ -1,3 +1,8 @@
+## 1.0.1 - TBD
+
+- improve documentation
+- test cleanup
+
 ## 1.0.0 - 2021-05-24
 
 ### Breaking Changes

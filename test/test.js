@@ -62,12 +62,7 @@ test('delete', t => {
 
 test('entries', t => {
     const { store } = t.context
-
-    // XXX we'd like to dump the entries as a plain object (it's more readable
-    // in the (Markdown) snapshot), but `Object.fromEntries` isn't supported by
-    // Node.js v10, and it's not worth transpiling the tests for one method, so
-    // this will have to do for now
-    const entries = Array.from(store.entries())
+    const entries = Object.fromEntries(store.entries())
 
     t.snapshot(entries)
 })
@@ -141,7 +136,7 @@ test('set', t => {
         t.is(store.size, i)
     }
 
-    const entries = Array.from(store.entries())
+    const entries = Object.fromEntries(store.entries())
 
     t.snapshot(entries)
 })
@@ -190,6 +185,8 @@ test('options.strict', t => {
         })
 
         global.GM_getValue = 42
+
+        t.notThrows(() => new GMStorage({ strict: false }))
 
         t.throws(() => new GMStorage({ strict: true }), {
             instanceOf: TypeError,
