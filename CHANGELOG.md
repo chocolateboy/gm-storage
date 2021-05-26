@@ -1,4 +1,4 @@
-## 1.0.1 - TBD
+## 1.0.1 - 2021-05-26
 
 - improve documentation
 - test cleanup
