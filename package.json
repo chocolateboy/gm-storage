@@ -22,9 +22,16 @@
         "typecheck": "tsc --noEmit --noUnusedLocals --noUnusedParameters --strict"
     },
     "files": [
-        "dist/*.d.ts",
-        "dist/*.js"
+        "dist/*.{js,d.ts}"
     ],
+    "exports": {
+        ".": {
+            "require": "./dist/index.js",
+            "import": "./dist/index.esm.js"
+        },
+        "./": "./dist/",
+        "./package.json": "./package.json"
+    },
     "browserslist": "maintained node versions",
     "devDependencies": {
         "@types/tampermonkey": "^4.0.0",
