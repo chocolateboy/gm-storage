@@ -1,6 +1,6 @@
 {
     "name": "gm-storage",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "An ES6 Map wrapper for the synchronous userscript storage API",
     "main": "dist/index.js",
     "module": "dist/index.esm.js",
