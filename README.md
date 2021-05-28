@@ -262,7 +262,7 @@ store.forEach((value, key) => {
 ```
 
 Iterates over each key/value pair in the store, passing them to the callback,
-along with the store itself, and binding the optional second parameter to `this`
+along with the store itself, and binding the optional second argument to `this`
 inside the callback.
 
 #### get
