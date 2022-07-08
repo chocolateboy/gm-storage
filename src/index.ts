@@ -1,10 +1,8 @@
-'use strict';
-
-export type Callback<V extends Value, U> = (
-    this: (U | undefined),
+export type Callback<K extends string, V extends Value, U> = (
+    this: U | undefined,
     value: V,
-    key: string,
-    store: GMStorage<V>
+    key: K,
+    store: GMStorage<K, V>
 ) => void;
 
 export type Options = {
@@ -16,12 +14,11 @@ export type Value =
     | boolean
     | number
     | string
-    | Array<Value>
+    | Value[]
     | { [key: string]: Value };
 
 // these are defined as globals in @types/tampermonkey
-// const: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions
-const GM_API_KEYS = <const>['GM_deleteValue', 'GM_getValue', 'GM_listValues', 'GM_setValue'];
+const GM_API_KEYS = ['GM_deleteValue', 'GM_getValue', 'GM_listValues', 'GM_setValue'] as const
 
 const NOT_FOUND = Symbol()
 const OPTIONS = { strict: true }
@@ -29,7 +26,7 @@ const OPTIONS = { strict: true }
 // minification helper
 const $global = globalThis
 
-class GMStorage<V extends Value = Value> implements Map<string, V> {
+class GMStorage<K extends string = string, V extends Value = Value> implements Map<K, V> {
     constructor (options: Options = OPTIONS) {
         if (!options.strict) {
             return
@@ -48,8 +45,8 @@ class GMStorage<V extends Value = Value> implements Map<string, V> {
         }
     }
 
-    private _keys (): Array<string> {
-        return $global.GM_listValues()
+    private _keys (): K[] {
+        return $global.GM_listValues() as K[]
     }
 
     public clear (): void {
@@ -58,41 +55,50 @@ class GMStorage<V extends Value = Value> implements Map<string, V> {
         }
     }
 
-    public delete (key: string): boolean {
+    public delete (key: K): boolean {
         return this.has(key) && ($global.GM_deleteValue(key), true)
     }
 
-    public *entries (): IterableIterator<[string, V]> {
+    public *entries (): Generator<[K, V]> {
         for (const key of this._keys()) {
-            const value = this.get(key) as V
-            yield [key, value]
+            yield [key, this.get(key)!]
         }
     }
 
     // "The length property of the forEach method is 1."
     // https://www.ecma-international.org/ecma-262/6.0/#sec-map.prototype.foreach
-    public forEach<U> (callback: Callback<V, U>, $this?: U): void {
+    public forEach <U>(callback: Callback<K, V, U>, $this: U): void
+    public forEach (callback: Callback<K, V, undefined>): void
+    public forEach (callback: Callback<K, V, unknown>, $this = undefined): void {
         for (const [key, value] of this.entries()) {
             callback.call($this, value, key, this)
         }
     }
 
-    public get (key: string): V | undefined
-    public get <D>(key: string, $default: D): V | D
-    public get (key: string, $default?: any) {
+    public get (key: K): V | undefined
+    public get <D>(key: K, $default: D): V | D
+    public get (key: K, $default = undefined) {
         return $global.GM_getValue(key, $default)
     }
 
-    public has (key: string): boolean {
+    public has (key: K): boolean {
         return $global.GM_getValue(key, NOT_FOUND) !== NOT_FOUND
     }
 
-    public *keys (): IterableIterator<string> {
+    public *keys (): Generator<K, void, undefined> {
         yield* this._keys()
     }
 
-    public set (key: string, value: V): this {
+    public set (key: K, value: V): this {
         $global.GM_setValue(key, value)
+        return this
+    }
+
+    public setAll (values: Iterable<[K, V]> = []): this {
+        for (const [key, value] of values) {
+            this.set(key, value)
+        }
+
         return this
     }
 
@@ -100,17 +106,17 @@ class GMStorage<V extends Value = Value> implements Map<string, V> {
         return this._keys().length
     }
 
-    public *values (): IterableIterator<V> {
+    public *values (): Generator<V> {
         for (const key of this._keys()) {
-            yield this.get(key) as V
+            yield this.get(key)!
         }
     }
 }
 
 /* aliases */
 
-interface GMStorage<V extends Value = Value> extends Map<string, V> {
-    [Symbol.iterator]: GMStorage<V>['entries'];
+interface GMStorage<K extends string = string, V extends Value = Value> extends Map<K, V> {
+    [Symbol.iterator]: GMStorage<K, V>['entries'];
 }
 
 Object.assign(GMStorage.prototype, {

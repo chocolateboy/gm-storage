@@ -1,3 +1,23 @@
+## 2.0.0 - TBD
+
+### Breaking change
+
+#### Types
+
+- change the type signature from `GMStorage<V extends Value = Value>` to
+  `GMStorage<K extends string = string, V extends Value = Value>` for parity
+  with `Map<K, V>`
+
+### Features
+
+- add a `setAll` method to assign multiple key/value pairs in one go
+
+### Changes
+
+- bump dev dependencies
+- update the build
+- test cleanup
+
 ## 1.1.0 - 2021-05-28
 
 - use [package.exports](https://nodejs.org/api/packages.html#packages_package_entry_points)

@@ -25,6 +25,7 @@
       - [has](#has)
       - [keys](#keys)
       - [set](#set)
+      - [setAll](#setall)
       - [values](#values)
     - [Properties](#properties)
       - [size](#size)
@@ -75,14 +76,12 @@ const store = new GMStorage()
 
 // now access userscript storage with the ES6 Map API
 
-store.set('foo', 'bar')
-     .set('baz', 'quux')
-
-store.set('alpha', 'beta')
-store.get('foo')                    // "bar"
-store.get('gamma', 'default value') // "default value"
-store.delete('alpha')               // true
-store.size                          // 2
+store.set('alpha', 'beta')                      // store
+store.setAll([['foo', 'bar'], ['baz', 'quux']]) // store
+store.get('foo')                                // "bar"
+store.get('gamma', 'default value')             // "default value"
+store.delete('alpha')                           // true
+store.size                                      // 2
 
 // iterables
 [...store.keys()]                   // ["foo", "baz"]
@@ -119,11 +118,11 @@ The following types are referenced in the descriptions below:
 <details>
 
 ```typescript
-type Callback<V extends Value, U> = (
-    this: (U | undefined),
+type Callback<K extends string, V extends Value, U> = (
+    this: U | undefined,
     value: V,
-    key: string,
-    store: GMStorage<V>
+    key: K,
+    store: GMStorage<K, V>
 ) => void;
 
 type Options = { strict?: boolean };
@@ -133,10 +132,10 @@ type Value =
     | boolean
     | number
     | string
-    | Array<Value>
+    | Value[]
     | { [key: string]: Value };
 
-class GMStorage<V extends Value = Value> implements Map<string, V> {}
+class GMStorage<K extends string = string, V extends Value = Value> implements Map<K, V> {}
 ```
 
 </details>
@@ -147,23 +146,22 @@ class GMStorage<V extends Value = Value> implements Map<string, V> {}
 
 ### Constructor
 
-- **Type**: `GMStorage<V extends Value = Value>(options?: Options)`
+- **Type**: `GMStorage<K extends string = string, V extends Value = Value>(options?: Options)`
 
 ```javascript
 import GMStorage from 'gm-storage'
 
 const store = new GMStorage()
 
-store.set('foo', 'bar')
-     .set('baz', 'quux')
+store.setAll([['foo', 'bar'], ['baz', 'quux']])
 
 console.log(store.size) // 2
 ```
 
 Constructs a Map-compatible instance which associates strings with values in
-the userscript engine's storage. `GMStorage<V>` instances are compatible with
-`Map<string, V>`, where `V` extends (or defaults to) the type of
-JSON-serializable values.
+the userscript engine's storage. `GMStorage<K, V>` instances are compatible
+with `Map<K, V>`, where `K` extends (and defaults to) string and `V` extends
+(and defaults to) the type of JSON-serializable values.
 
 #### Options
 
@@ -205,9 +203,7 @@ required by unused storage methods need not be granted.
 - **Requires**: `GM_deleteValue`, `GM_listValues`
 
 ```javascript
-const store = new GMStorage()
-    .set('foo', 'bar')
-    .set('baz', 'quux')
+const store = new GMStorage().setAll([['foo', 'bar'], ['baz', 'quux']])
 
 store.size    // 2
 store.clear()
@@ -218,13 +214,11 @@ Remove all entries from the store.
 
 #### delete
 
-- **Type**: `delete(key: string): boolean`
+- **Type**: `delete(key: K): boolean`
 - **Requires**: `GM_deleteValue`, `GM_getValue`
 
 ```javascript
-const store = new GMStorage()
-    .set('foo', 'bar')
-    .set('baz', 'quux')
+const store = new GMStorage().setAll([['foo', 'bar'], ['baz', 'quux']])
 
 store.size           // 2
 store.delete('nope') // false
@@ -238,7 +232,7 @@ value existed, false otherwise.
 
 #### entries
 
-- **Type**: `entries(): IterableIterator<[string, V]>`
+- **Type**: `entries(): Generator<[K, V]>`
 - **Requires**: `GM_getValue`, `GM_listValues`
 - **Alias**: [`Symbol.iterator`](#symboliterator)
 
@@ -252,7 +246,7 @@ Returns an iterable which yields each key/value pair from the store.
 
 #### forEach
 
-- **Type**: `forEach<U>(callback: Callback<V, U>, thisArg?: U): void`
+- **Type**: `forEach<U>(callback: Callback<K, V, U>, thisArg?: U): void`
 - **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
@@ -267,7 +261,7 @@ inside the callback.
 
 #### get
 
-- **Type**: `get<D>(key: string, defaultValue?: D): V | D | undefined `
+- **Type**: `get<D>(key: K, defaultValue?: D): V | D | undefined `
 - **Requires**: `GM_getValue`
 
 ```javascript
@@ -280,7 +274,7 @@ Returns the value corresponding to the supplied key, or the default value
 
 #### has
 
-- **Type**: `has(key: string): boolean`
+- **Type**: `has(key: K): boolean`
 - **Requires**: `GM_getValue`
 
 ```javascript
@@ -294,7 +288,7 @@ otherwise.
 
 #### keys
 
-- **Type**: `keys(): IterableIterator<string>`
+- **Type**: `keys(): Generator<K, void, undefined>`
 - **Requires**: `GM_listValues`
 
 ```javascript
@@ -310,7 +304,7 @@ is *not* an array.
 
 #### set
 
-- **Type**: `set(key: string, value: V): this`
+- **Type**: `set(key: K, value: V): this`
 - **Requires**: `GM_setValue`
 
 ```javascript
@@ -321,9 +315,23 @@ store.set('foo', 'bar')
 Add a value to the store under the supplied key. Returns `this` (i.e. the
 GMStorage instance the method was called on) for chaining.
 
+#### setAll
+
+- **Type**: `setAll(values?: Iterable<[K, V]>): this`
+- **Requires**: `GM_setValue`
+
+```javascript
+store.setAll([['foo', 'bar'], ['baz', 'quux']])
+store.has('foo') // true
+store.get('baz') // "quux"
+```
+
+Add entries (key/value pairs) to the store. Returns `this` (i.e. the
+GMStorage instance the method was called on) for chaining.
+
 #### values
 
-- **Type**: `values(): IterableIterator<V>`
+- **Type**: `values(): Generator<V>`
 - **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
