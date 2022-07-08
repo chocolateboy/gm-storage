@@ -1,96 +1,109 @@
 import size           from 'rollup-plugin-filesize'
 import { terser }     from 'rollup-plugin-terser'
-import minifyPrivates from 'ts-transformer-properties-rename'
-import ts             from '@wessberg/rollup-plugin-ts'
+import ts             from 'rollup-plugin-ts'
+import minifyPrivates from 'ts-transformer-minify-privates'
+
+const ENTRIES = ['index']
+const NAME = 'GMStorage'
+const PRESERVE_NAMES = [NAME]
 
 const isDev = process.env.NODE_ENV !== 'production'
-const external = isDev ? ['source-map-support/register'] : []
+const pkg = require('./package.json')
 
-const $size = size({ showMinifiedSize: false })
+const banner = `/* ${pkg.name} ${pkg.version}. @copyright 2020 ${pkg.author}. @license ${pkg.license} */`
+const external = isDev ? ['source-map-support/register'] : []
+const tsconfig = config => ({ ...config, allowJs: false, checkJs: false })
 
 const transformers = [
     service => ({
-        before: [minifyPrivates(service.program, {
-            entrySourceFiles: ['./src/index.ts'],
-            internalPrefix: '', // don't rename "internal" properties
-        })]
+        before: [minifyPrivates(service.program)]
     })
 ]
 
+const $size = size({ showMinifiedSize: false })
+
 const $ts = ts({
     transpiler: 'babel',
+    tsconfig,
     babelConfig: {
         plugins: isDev ? ['source-map-support'] : [],
     }
 })
 
 const $tsMin = ts({
-    transpiler: 'babel',
     transformers,
+    transpiler: {
+        typescriptSyntax: 'typescript',
+        otherSyntax: 'babel'
+    },
+
+    tsconfig,
 })
 
 const $terser = terser({
     ecma: 2015,
     compress: {
         passes: 2,
-        keep_fnames: true,
     },
     mangle: {
         properties: {
-            regex: /^_private_/,
+            regex: /^_private_/
         },
-        reserved: ['GMStorage'],
-    }
+        reserved: PRESERVE_NAMES,
+    },
 })
 
-const cjs = {
-    input: 'src/index.ts',
+const cjs = ENTRIES.map(name => ({
+    input: `src/${name}.ts`,
     plugins: [$ts],
     external,
     output: {
-        file: 'dist/index.js',
+        file: `dist/${name}.js`,
         format: 'cjs',
         sourcemap: isDev,
+        banner,
     },
-}
+}))
 
-const release = [
-    {
-        input: 'src/index.ts',
-        plugins: [$ts],
-        output: [
-            {
-                file: 'dist/index.esm.js',
-                format: 'esm',
-            },
-            {
-                file: 'dist/index.umd.js',
-                format: 'umd',
-                name: 'GMStorage',
-            },
-        ]
-    },
-    {
-        input: 'src/index.ts',
-        plugins: [$tsMin],
-        output: [
-            {
-                file: 'dist/index.umd.min.js',
-                format: 'umd',
-                name: 'GMStorage',
-                plugins: [$terser, $size],
-            },
+const release = ENTRIES.map(name => ({
+    input: `src/${name}.ts`,
+    plugins: [$ts],
+    output: [
+        {
+            file: `dist/${name}.esm.js`,
+            format: 'esm',
+            banner,
+        },
+        {
+            file: `dist/${name}.umd.js`,
+            format: 'umd',
+            name: NAME,
+            banner,
+        },
+    ]
+}))
 
-            // this is just for information: it's not packaged
-            {
-                file: 'dist/data/index.esm.min.js',
-                format: 'esm',
-                plugins: [$terser, $size],
-            }
-        ]
-    }
-]
+const minified = ENTRIES.map(name => ({
+    input: `src/${name}.ts`,
+    plugins: [$tsMin],
+    output: [
+        {
+            file: `dist/${name}.umd.min.js`,
+            format: 'umd',
+            name: NAME,
+            plugins: [$terser, $size],
+            banner,
+        },
 
-const config = isDev ? [cjs] : [cjs, ...release]
+        // this is just for information: it's not packaged
+        {
+            file: `dist/data/${name}.esm.min.js`,
+            format: 'esm',
+            plugins: [$terser, $size],
+        }
+    ]
+}))
+
+const config = isDev ? cjs : [...cjs, ...release, ...minified]
 
 export default config
