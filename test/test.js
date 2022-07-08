@@ -1,7 +1,21 @@
+'use strict';
+
 const test                      = require('ava')
 const { initBackingStore, API } = require('./_util.js')
 
-const COUNT = 10
+const ENTRIES = [['foo', 1], ['bar', 2], ['baz', 3], ['quux', 4]]
+const FULL    = ENTRIES.length
+const KEYS    = ENTRIES.map(it => it[0])
+const NON_KEY = 'no-such-key'
+const OBJECT  = Object.fromEntries(ENTRIES)
+const VALUES  = ENTRIES.map(it => it[1])
+
+const entries = function* () {
+    for (let i = 0; i < FULL; ++i) {
+        yield ENTRIES[i]
+    }
+}
+
 const GMStorage = require('..')
 
 Object.assign(global, API)
@@ -13,48 +27,34 @@ test.beforeEach(t => {
     t.is(backingStore.size, 0)
     t.is(store.size, 0)
     t.not(store, backingStore)
-
-    for (let i = 1; i <= COUNT; ++i) {
-        const key = `key-${i}`
-        const value = `value-${i}`
-
-        t.is(store.size, i - 1)
-        t.is(store.has(key), false)
-        store.set(key, value)
-        t.is(store.has(key), true)
-        t.is(store.size, i)
-    }
-
-    t.is(store.size, COUNT)
+    store.setAll(ENTRIES)
+    t.is(store.size, FULL)
     t.context.store = store
 })
 
 test('clear', t => {
     const { store } = t.context
 
-    t.is(store.size, COUNT)
-    t.is(store.has('key-1'), true)
-
+    t.is(store.size, FULL)
     store.clear()
 
-    t.is(store.has('key-1'), false)
-    t.is(store.size, 0)
+    for (const key of KEYS) {
+        t.false(store.has(key))
+    }
 })
 
 test('delete', t => {
     const { store } = t.context
 
-    t.is(store.size, COUNT)
+    t.is(store.size, FULL)
 
-    for (let i = COUNT; i >= 1; --i) {
-        const notAKey = `no-such-key-${i}`
-        const key = `key-${i}`
-
+    for (let i = FULL - 1; i >= 0; --i) {
+        const key = KEYS[i]
+        t.is(store.size, i + 1)
+        t.true(store.has(key))
+        store.delete(key)
+        t.false(store.has(key))
         t.is(store.size, i)
-        t.is(store.delete(notAKey), false)
-        t.is(store.size, i)
-        t.is(store.delete(key), true)
-        t.is(store.size, i - 1)
     }
 
     t.is(store.size, 0)
@@ -62,104 +62,172 @@ test('delete', t => {
 
 test('entries', t => {
     const { store } = t.context
-    const entries = Object.fromEntries(store.entries())
 
-    t.snapshot(entries)
+    let i = 0
+
+    for (const entry of store.entries()) {
+        t.deepEqual(entry, ENTRIES[i++])
+    }
+
+    store.clear()
+
+    for (const entry of store.entries()) {
+        t.fail()
+    }
 })
 
 test('forEach', t => {
     const { store } = t.context
-    const $this = {}
-    const seen = {}
+    const $this = { this: true }
+    const seen1 = {}
+    const seen2 = {}
+
+    store.forEach(function (value, key, _store) {
+        t.is(this, undefined)
+        t.is(_store, store)
+        seen1[key] = value
+    })
+
+    t.deepEqual(seen1, OBJECT)
 
     store.forEach(function (value, key, _store) {
         t.is(this, $this)
         t.is(_store, store)
-        seen[key] = value
+        seen2[key] = value
     }, $this)
 
-    t.snapshot(seen)
+    t.deepEqual(seen2, OBJECT)
 })
 
 test('get', t => {
     const { store } = t.context
     const $default = Symbol('default')
 
-    for (let i = 1; i <= COUNT; ++i) {
-        const notAKey = `no-such-key-${i}`
-        const key = `key-${i}`
-        const value = `value-${i}`
-
+    for (const [key, value] of ENTRIES) {
+        t.is(store.get(NON_KEY), undefined)
+        t.is(store.get(NON_KEY, $default), $default)
         t.is(store.get(key), value)
-        t.is(store.get(notAKey), undefined)
         t.is(store.get(key, $default), value)
-        t.is(store.get(notAKey, $default), $default)
     }
 })
 
 test('has', t => {
     const { store } = t.context
 
-    for (let i = 1; i <= COUNT; ++i) {
-        const key = `key-${i}`
-        const notAKey = `no-such-key-${i}`
-
-        t.is(store.has(key), true)
-        t.is(store.has(notAKey), false)
+    for (const key of KEYS) {
+        t.false(store.has(NON_KEY))
+        t.true(store.has(key))
+        store.delete(key)
+        t.false(store.has(key))
     }
 })
 
 test('keys', t => {
     const { store } = t.context
-    const keys = store.keys()
+    const seen = []
 
-    t.is(Array.isArray(keys), false) // no longer an array
-    t.assert(Symbol.iterator in keys)
-    t.snapshot(Array.from(keys))
+    t.false(Array.isArray(store.keys())) // no longer an array
+
+    for (const key of store.keys()) {
+        seen.push(key)
+    }
+
+    t.deepEqual(seen, KEYS)
+
+    store.clear()
+
+    for (const key of store.keys()) {
+        t.fail()
+    }
 })
 
 test('set', t => {
     const { store } = t.context
 
-    store.clear()
-
-    for (let i = 1; i <= COUNT; ++i) {
-        const key = `set-key-${i}`
-        const value = `set-value-${i}`
-
-        t.is(store.size, i - 1)
-        t.is(store.get(key), undefined)
-        t.is(store.has(key), false)
-        t.is(store.set(key, value), store)
-        t.is(store.get(key), value)
-        t.is(store.has(key), true)
-        t.is(store.size, i)
+    for (const [key, value] of ENTRIES) {
+        store.set(key, value)
+        t.deepEqual([...store.entries()], ENTRIES)
     }
 
-    const entries = Object.fromEntries(store.entries())
+    store.clear()
+    t.is(store.size, 0)
 
-    t.snapshot(entries)
+    for (let i = 0; i < FULL; ++i) {
+        const [key, value] = ENTRIES[i]
+        t.is(store.size, i)
+        t.false(store.has(key))
+        store.set(key, value)
+        t.true(store.has(key))
+        t.is(store.size, i + 1)
+    }
+
+    t.is(store.size, FULL)
+})
+
+test('setAll', t => {
+    const { store } = t.context
+    const values1 = [['foo', 'bar'], ['baz', 'quux']]
+
+    const values2 = function* () {
+        yield ['foo', 1]
+        yield ['bar', 2]
+        yield ['baz', 3]
+        yield ['quux', 4]
+    }
+
+    store.clear()
+
+    const verify = () => {
+        t.is(store.size, FULL)
+
+        for (const [key, value] of ENTRIES) {
+            t.true(store.has(key))
+            t.is(store.get(key), value)
+        }
+    }
+
+    store.setAll(ENTRIES)
+    verify()
+
+    store.clear()
+    store.setAll(entries())
+    verify()
+
+    store.setAll()
+    verify()
+
+    store.setAll([])
+    verify()
 })
 
 test('size', t => {
     const { store } = t.context
 
-    for (let i = 1; i <= COUNT; ++i) {
-        store.clear()
+    store.clear()
 
-        t.is(store.size, 0)
-
-        for (let j = 1; j <= i; ++j) {
-            store.set(j, j)
-        }
-
+    for (let i = 0; i < FULL; ++i) {
         t.is(store.size, i)
+        const [key, value] = ENTRIES[i]
+        store.set(key, value)
+        t.is(store.size, i + 1)
     }
 })
 
 test('values', t => {
     const { store } = t.context
-    t.snapshot(Array.from(store.values()))
+    const seen = []
+
+    for (const value of store.values()) {
+        seen.push(value)
+    }
+
+    t.deepEqual(seen, VALUES)
+
+    store.clear()
+
+    for (const value of store.values()) {
+        t.fail()
+    }
 })
 
 test('options.strict', t => {
