@@ -65,7 +65,7 @@ $ npm install gm-storage
 // ==UserScript==
 // @name     My Userscript
 // @include  https://www.example.com/*
-// @require  https://unpkg.com/gm-storage@2.0.2
+// @require  https://unpkg.com/gm-storage@2.0.3
 // @grant    GM_deleteValue
 // @grant    GM_getValue
 // @grant    GM_listValues
@@ -409,7 +409,7 @@ The following NPM scripts are available:
 
 # VERSION
 
-2.0.2
+2.0.3
 
 # AUTHOR
 
@@ -422,5 +422,5 @@ Copyright © 2020-2022 by chocolateboy.
 This is free software; you can redistribute it and/or modify it under the terms
 of the [MIT license](https://opensource.org/licenses/MIT).
 
-[jsDelivr]: https://cdn.jsdelivr.net/npm/gm-storage@2.0.2/dist/index.umd.min.js
-[unpkg]: https://unpkg.com/gm-storage@2.0.2/dist/index.umd.min.js
+[jsDelivr]: https://cdn.jsdelivr.net/npm/gm-storage@2.0.3/dist/index.umd.min.js
+[unpkg]: https://unpkg.com/gm-storage@2.0.3/dist/index.umd.min.js
