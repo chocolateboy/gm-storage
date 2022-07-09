@@ -49,7 +49,7 @@ gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 
 - implements the full Map API with some helpful extras
 - no dependencies
-- &lt; 450 B minified + gzipped
+- ~ lt; 500 B minified + gzipped
 - fully typed (TypeScript)
 - CDN builds (UMD) - [jsDelivr][], [unpkg][]
 
@@ -76,12 +76,11 @@ const store = new GMStorage()
 
 // now access userscript storage with the ES6 Map API
 
-store.set('alpha', 'beta')                      // store
-store.setAll([['foo', 'bar'], ['baz', 'quux']]) // store
-store.get('foo')                                // "bar"
-store.get('gamma', 'default value')             // "default value"
-store.delete('alpha')                           // true
-store.size                                      // 2
+store.set('alpha', 'beta')          // store
+store.get('foo')                    // "bar"
+store.get('gamma', 'default value') // "default value"
+store.delete('alpha')               // true
+store.size                          // 2
 
 // iterables
 [...store.keys()]                   // ["foo", "baz"]
@@ -154,7 +153,6 @@ import GMStorage from 'gm-storage'
 const store = new GMStorage()
 
 store.setAll([['foo', 'bar'], ['baz', 'quux']])
-
 console.log(store.size) // 2
 ```
 
