@@ -49,7 +49,7 @@ gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 
 - implements the full Map API with some helpful extras
 - no dependencies
-- ~ lt; 500 B minified + gzipped
+- &lt; 500 B minified + gzipped
 - fully typed (TypeScript)
 - CDN builds (UMD) - [jsDelivr][], [unpkg][]
 
