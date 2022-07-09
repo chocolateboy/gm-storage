@@ -8,7 +8,7 @@
 
 ## 2.0.0 - 2022-07-09
 
-### Breaking change
+### Breaking changes
 
 #### Types
 
