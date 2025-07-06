@@ -149,9 +149,9 @@ class GMStorage<K extends string = string, V extends Value = Value> implements M
 - **Type**: `GMStorage<K extends string = string, V extends Value = Value>(options?: Options)`
 
 ```javascript
-import GMStorage from 'gm-storage'
+import GMStore from 'gm-storage'
 
-const store = new GMStorage()
+const store = new GMStore()
 
 store.setAll([['foo', 'bar'], ['baz', 'quux']])
 
@@ -246,7 +246,9 @@ Returns an iterable which yields each key/value pair from the store.
 
 #### forEach
 
-- **Type**: `forEach<U>(callback: Callback<K, V, U>, thisArg?: U): void`
+- **Type**:
+  - `forEach<U>(callback: Callback<K, V, U>, thisArg: U): void`
+  - `forEach(callback: Callback<K, V, undefined>): void`
 - **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
@@ -261,7 +263,9 @@ inside the callback.
 
 #### get
 
-- **Type**: `get<D>(key: K, defaultValue?: D): V | D | undefined `
+- **Type**:
+  - `get<D>(key: K, defaultValue: D): V | D`
+  - `get(key: K): V | undefined`
 - **Requires**: `GM_getValue`
 
 ```javascript
@@ -312,8 +316,8 @@ store.set('foo', 'bar')
      .set('baz', 'quux')
 ```
 
-Add a value to the store under the supplied key. Returns `this` (i.e. the
-GMStorage instance the method was called on) for chaining.
+Add a value to the store under the supplied key. Returns the store for
+chaining.
 
 #### setAll
 
@@ -326,8 +330,7 @@ store.has('foo') // true
 store.get('baz') // "quux"
 ```
 
-Add entries (key/value pairs) to the store. Returns `this` (i.e. the
-GMStorage instance the method was called on) for chaining.
+Add entries (key/value pairs) to the store. Returns the store for chaining.
 
 #### values
 
