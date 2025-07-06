@@ -1,3 +1,29 @@
+## 3.0.0 - TBD
+
+### Breaking changes
+
+#### Features
+
+- keys are stored and retrieved as JSON values rather than strings:
+
+    before:
+
+        store.set(JSON.stringify(["foo"]), "bar")
+        store.get(JSON.stringify(["foo"])) // "bar"
+
+    after:
+
+        store.set(["foo"], "bar")
+        store.get(["foo"]) // "bar"
+
+#### Types
+
+- rename JSON type: Value -> JSONValue
+
+### Fixes
+
+- fix Map compatibility under +exactOptionalPropertyTypes+
+
 ## 2.0.3 - 2022-07-09
 
 - docfix
@@ -20,11 +46,11 @@
   `GMStorage<K extends string = string, V extends Value = Value>` for parity
   with `Map<K, V>`
 
-### Features
+#### Features
 
 - add a `setAll` method to assign multiple key/value pairs in one go
 
-### Changes
+#### Changes
 
 - bump dev dependencies
 - update the build

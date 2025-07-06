@@ -1,32 +1,49 @@
 {
     "compilerOptions": {
+        "allowJs": false,
         "allowSyntheticDefaultImports": true,
         "alwaysStrict": true,
         "baseUrl": "./",
-        "declarationMap": false,
+        "checkJs": false,
         "declaration": true,
+        "declarationDir": "./dist",
+        "declarationMap": false,
         "downlevelIteration": true,
+        "emitDeclarationOnly": true,
         "esModuleInterop": true,
+        // XXX can't set this due to a bug in @types/tampermonkey
+        // "exactOptionalPropertyTypes": true,
         "experimentalDecorators": true,
         "extendedDiagnostics": true,
-        "module": "ESNext",
-        "moduleResolution": "node",
+        "isolatedDeclarations": false,
+        "isolatedModules": true,
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
+        "moduleDetection": "force",
+        "module": "preserve",
+        "moduleResolution": "bundler",
         "newLine": "LF",
+        "noErrorTruncation": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
+        "noImplicitOverride": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
-        "noUnusedLocals": false,
-        "noUnusedParameters": false,
+        "noUncheckedIndexedAccess": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "outDir": "dist",
         "removeComments": false,
         "resolveJsonModule": true,
         "sourceMap": true,
         "strict": true,
         "target": "ESNext",
-        "typeRoots": [
-            "node_modules/@types"
-        ]
+        "typeRoots": ["node_modules/@types"],
+        "useUnknownInCatchVariables": false
     },
-    "include": ["./*.ts", "./index.d.ts", "src/**/*.*"]
+    "typeAcquisition": {
+        "enable": false,
+        "disableFilenameBasedTypeAcquisition": true
+    },
+    "exclude": ["node_modules"],
+    "include": ["src/**/*.ts"]
 }

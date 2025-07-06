@@ -49,7 +49,7 @@ gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 
 - implements the full Map API with some helpful extras
 - no dependencies
-- &lt; 500 B minified + gzipped
+- &lt; 800 B minified + gzipped
 - fully typed (TypeScript)
 - CDN builds (UMD) - [jsDelivr][], [unpkg][]
 
@@ -76,17 +76,16 @@ const store = new GMStorage()
 
 // now access userscript storage with the ES6 Map API
 
-store.set('alpha', 'beta')                 // store
-store.set('foo', 'bar').set('baz', 'quux') // store
-store.get('foo')                           // "bar"
-store.get('gamma', 'default value')        // "default value"
-store.delete('alpha')                      // true
-store.size                                 // 2
+store.set('alpha', 'beta')                     // store
+store.set(['foo'], 'bar').set(['baz'], 'quux') // store
+store.get(['foo'])                             // "bar"
+store.get('gamma', 'default value')            // "default value"
+store.delete('alpha')                          // true
+store.size                                     // 2
 
 // iterables
-[...store.keys()]                   // ["foo", "baz"]
-[...store.values()]                 // ["bar", "quux"]
-Object.fromEntries(store.entries()) // { foo: "bar", baz: "quux" }
+[...store.keys()]   // [["foo"], ["baz"]]
+[...store.values()] // ["bar", "quux"]
 ```
 
 # DESCRIPTION
@@ -118,7 +117,7 @@ The following types are referenced in the descriptions below:
 <details>
 
 ```typescript
-type Callback<K extends string, V extends Value, U> = (
+type Callback<K extends JSONValue, V extends JSONValue, U> = (
     this: U | undefined,
     value: V,
     key: K,
@@ -127,15 +126,15 @@ type Callback<K extends string, V extends Value, U> = (
 
 type Options = { strict?: boolean };
 
-type Value =
+type JSONValue =
     | null
     | boolean
     | number
     | string
-    | Value[]
-    | { [key: string]: Value };
+    | JSONValue[]
+    | { [key: string]: JSONValue };
 
-class GMStorage<K extends string = string, V extends Value = Value> implements Map<K, V> {}
+class GMStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {}
 ```
 
 </details>
@@ -146,7 +145,7 @@ class GMStorage<K extends string = string, V extends Value = Value> implements M
 
 ### Constructor
 
-- **Type**: `GMStorage<K extends string = string, V extends Value = Value>(options?: Options)`
+- **Type**: `GMStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: Options)`
 
 ```javascript
 import GMStore from 'gm-storage'
@@ -158,10 +157,10 @@ store.setAll([['foo', 'bar'], ['baz', 'quux']])
 console.log(store.size) // 2
 ```
 
-Constructs a Map-compatible instance which associates strings with values in
-the userscript engine's storage. `GMStorage<K, V>` instances are compatible
-with `Map<K, V>`, where `K` extends (and defaults to) string and `V` extends
-(and defaults to) the type of JSON-serializable values.
+Constructs a Map-compatible instance which associates keys with their
+corresponding values in the userscript engine's storage. `GMStorage<K, V>`
+instances are compatible with `Map<K, V>`, where `K` and `V` extend (and
+default to) the type of JSON-serializable values.
 
 #### Options
 
