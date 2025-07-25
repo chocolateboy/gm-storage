@@ -16,6 +16,8 @@
     - [Constructor](#constructor)
       - [Options](#options)
         - [strict](#strict)
+  - [JSONKeyStorage](#jsonkeystorage)
+    - [Constructor](#constructor-1)
     - [Methods](#methods)
       - [clear](#clear)
       - [delete](#delete)
@@ -49,7 +51,7 @@ gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 
 - implements the full Map API with some helpful extras
 - no dependencies
-- &lt; 800 B minified + gzipped
+- &lt; 900 B minified + gzipped
 - fully typed (TypeScript)
 - CDN builds (UMD) - [jsDelivr][], [unpkg][]
 
@@ -72,20 +74,23 @@ $ npm install gm-storage
 // @grant    GM_setValue
 // ==/UserScript==
 
+import GMStore from 'gm-storage'
+
 const store = new GMStorage()
 
 // now access userscript storage with the ES6 Map API
 
-store.set('alpha', 'beta')                     // store
-store.set(['foo'], 'bar').set(['baz'], 'quux') // store
-store.get(['foo'])                             // "bar"
-store.get('gamma', 'default value')            // "default value"
-store.delete('alpha')                          // true
-store.size                                     // 2
+store.set('alpha', 'beta')                 // store
+store.set('foo', 'bar').set('baz', 'quux') // store
+store.get('foo')                           // "bar"
+store.get('gamma', 'default value')        // "default value"
+store.delete('alpha')                      // true
+store.size                                 // 2
 
 // iterables
-[...store.keys()]   // [["foo"], ["baz"]]
-[...store.values()] // ["bar", "quux"]
+[...store.keys()]                   // [["foo"], ["baz"]]
+[...store.values()]                 // ["bar", "quux"]
+Object.fromEntries(store.entries()) // { foo: "bar", baz: "quux" }
 ```
 
 # DESCRIPTION
@@ -134,7 +139,8 @@ type JSONValue =
     | JSONValue[]
     | { [key: string]: JSONValue };
 
-class GMStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {}
+class GMStorage<K extends string = string, V extends JSONValue = JSONValue> implements Map<K, V> {}
+class JSONKeyStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {}
 ```
 
 </details>
@@ -143,9 +149,11 @@ class GMStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue
 
 ## GMStorage (default)
 
+- **Alias**: GMStorage, GMStore
+
 ### Constructor
 
-- **Type**: `GMStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: Options)`
+- **Type**: `GMStorage<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
 
 ```javascript
 import GMStore from 'gm-storage'
@@ -193,6 +201,29 @@ exception is thrown.
 
 If the option is false, they are not checked, and access to `GM_*` functions
 required by unused storage methods need not be granted.
+
+## JSONKeyStorage
+
+- **Alias**: JSONKeyStorage, JSONKeyStore
+
+### Constructor
+
+- **Type**: `JSONKeyStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: Options)`
+
+```javascript
+import { JSONKeyStore } from 'gm-storage'
+
+const store = new JSONKeyStore()
+
+store.set(['foo'], 'bar')
+store.set({ foo: 'bar' }, ['baz', 'quux'])
+store.get(['foo'])        // "bar"
+store.get({ foo: 'bar' }) // ["baz", "quux"]
+```
+
+This class is an extension of the GMStorage class which supports the automatic
+conversion of keys to/from JSON. Apart from this, its behavior, methods and
+properties are the same as GMStorage.
 
 ### Methods
 
@@ -291,7 +322,7 @@ otherwise.
 
 #### keys
 
-- **Type**: `keys(): Generator<K, void, undefined>`
+- **Type**: `keys(): Generator<K>`
 - **Requires**: `GM_listValues`
 
 ```javascript

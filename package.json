@@ -11,7 +11,7 @@
     "author": "chocolateboy",
     "license": "MIT",
     "scripts": {
-        "build": "rollup -c --exports default --no-externalLiveBindings --no-treeshake.moduleSideEffects",
+        "build": "rollup -c --exports named --no-externalLiveBindings --no-treeshake.moduleSideEffects",
         "build:doc": "toc-md README.md",
         "build:dts": "tsc --declaration --emitDeclarationOnly --noImplicitAny --noUnusedLocals --noUnusedParameters --strict",
         "build:release": "cross-env NODE_ENV=production run-s build:dts build build:doc",

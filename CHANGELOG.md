@@ -1,3 +1,33 @@
+## 4.0.0 - TBD
+
+### Breaking changes
+
+- restore string keys for the default GMStorage export, and add the JSON-key
+  variant (JSONKeyStorage) as a separate export:
+
+```javascript
+    import GMStorage from 'gm-storage'
+    import { JSONKeyStorage } from 'gm-storage'
+
+    const stringKeyStore = new GMStorage()
+    const jsonKeyStore = new JSONKeyStorage()
+```
+
+  this is a breaking change (again) as the extra export means an unnamed export
+  can no longer be used in CommonJS, i.e. `require`s which could previously be
+  written as:
+
+```javascript
+   const GMStore = require('gm-storage')
+```
+
+  now need to specify the name, e.g.:
+
+```javascript
+    const GMStorage = require('gm-storage').default
+    const { GMStorage } = require('gm-storage')
+```
+
 ## 3.0.0 - 2025-07-25
 
 ### Breaking changes
@@ -8,13 +38,17 @@
 
     before:
 
-        store.set(JSON.stringify(["foo"]), "bar")
-        store.get(JSON.stringify(["foo"])) // "bar"
+```javascript
+        store.set(JSON.stringify(['foo']), 'bar')
+        store.get(JSON.stringify(['foo'])) // "bar"
+```
 
     after:
 
-        store.set(["foo"], "bar")
-        store.get(["foo"]) // "bar"
+```javascript
+        store.set(['foo'], "bar")
+        store.get(['foo']) // "bar"
+```
 
 #### Types
 
@@ -22,7 +56,7 @@
 
 ### Fixes
 
-- fix Map compatibility under +exactOptionalPropertyTypes+
+- fix Map compatibility under `exactOptionalPropertyTypes`
 
 ## 2.0.3 - 2022-07-09
 

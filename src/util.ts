@@ -8,6 +8,8 @@ export type JSONValue =
     | JSONValue[]
     | { [key: string]: JSONValue };
 
+export const identity = <T>(value: T): T => value
+
 const toString = {}.toString
 
 const isPlainObject = <T extends Record<PropertyKey, unknown> = Record<PropertyKey, unknown>>(value: unknown): value is T => {
