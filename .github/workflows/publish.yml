@@ -19,21 +19,26 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: install pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: latest
 
       - name: set up node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
 
       - name: install
-        run: yarn install --prefer-offline
+        run: pnpm install --prefer-offline
 
       - name: test
-        run: yarn run prepublishOnly
+        run: pnpm run prepublishOnly
 
       - name: publish
-        uses: JS-DevTools/npm-publish@0f451a94170d1699fd50710966d48fb26194d939
+        uses: JS-DevTools/npm-publish@19c28f1ef146469e409470805ea4279d47c3d35c
         with:
           access: public
           token: ${{ secrets.NPM_TOKEN }}

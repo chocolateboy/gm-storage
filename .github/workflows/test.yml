@@ -16,7 +16,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
-        uses: fkirc/skip-duplicate-actions@f75dd6564bb646f95277dc8c3b80612e46a4a1ea
+        uses: fkirc/skip-duplicate-actions@f75f66ce1886f00957d99748a42c724f4330bdcf
         with:
           concurrent_skipping: 'same_content'
           paths_ignore: '["**/*.md"]'
@@ -30,20 +30,25 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        node-version: [14, 16, 18]
+        node-version: [20, 22, 24]
 
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: install pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: latest
 
       - name: set up node v${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: yarn
+          cache: pnpm
 
       - name: install
-        run: yarn install --prefer-offline --frozen-lockfile
+        run: pnpm install --prefer-offline --frozen-lockfile
 
       - name: test
-        run: yarn test
+        run: pnpm test

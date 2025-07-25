@@ -34,6 +34,11 @@
         }
     },
     "browserslist": "maintained node versions",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "esbuild"
+        ]
+    },
     "devDependencies": {
         "@rollup/plugin-terser": "^0.4.4",
         "@types/node": "^24.0.10",

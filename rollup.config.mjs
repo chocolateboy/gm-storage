@@ -67,6 +67,6 @@ const bundle = {
     ]
 }
 
-const config = isDev ? [esm] : [cjs, esm, bundle]
+const config = isDev ? [cjs] : [cjs, esm, bundle]
 
 export default config
