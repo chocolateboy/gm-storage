@@ -167,8 +167,8 @@ console.log(store.size) // 2
 
 Constructs a Map-compatible instance which associates keys with their
 corresponding values in the userscript engine's storage. `GMStorage<K, V>`
-instances are compatible with `Map<K, V>`, where `K` and `V` extend (and
-default to) the type of JSON-serializable values.
+instances are compatible with `Map<K, V>`, where `K` extends (and defaults to)
+string and `V` extends (and defaults to) the type of JSON-serializable values.
 
 #### Options
 
