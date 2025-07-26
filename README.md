@@ -12,12 +12,14 @@
 - [DESCRIPTION](#description)
 - [TYPES](#types)
 - [EXPORTS](#exports)
-  - [GMStorage (default)](#gmstorage-default)
+  - [GMStore (default)](#gmstore-default)
     - [Constructor](#constructor)
       - [Options](#options)
         - [strict](#strict)
-  - [JSONKeyStorage](#jsonkeystorage)
+  - [JSONKeyStore](#jsonkeystore)
     - [Constructor](#constructor-1)
+      - [Options](#options-1)
+        - [canonical](#canonical)
     - [Methods](#methods)
       - [clear](#clear)
       - [delete](#delete)
@@ -74,8 +76,6 @@ $ npm install gm-storage
 // @grant    GM_setValue
 // ==/UserScript==
 
-import GMStore from 'gm-storage'
-
 const store = new GMStorage()
 
 // now access userscript storage with the ES6 Map API
@@ -122,15 +122,6 @@ The following types are referenced in the descriptions below:
 <details>
 
 ```typescript
-type Callback<K extends JSONValue, V extends JSONValue, U> = (
-    this: U | undefined,
-    value: V,
-    key: K,
-    store: GMStorage<K, V>
-) => void;
-
-type Options = { strict?: boolean };
-
 type JSONValue =
     | null
     | boolean
@@ -139,21 +130,36 @@ type JSONValue =
     | JSONValue[]
     | { [key: string]: JSONValue };
 
-class GMStorage<K extends string = string, V extends JSONValue = JSONValue> implements Map<K, V> {}
-class JSONKeyStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {}
+type Callback<K extends JSONValue, V extends JSONValue, U> = (
+    this: U | undefined,
+    value: V,
+    key: K,
+    store: GMStorage<K, V>
+) => void;
+
+interface Options {
+    strict?: boolean;
+};
+
+interface JSONKeyStoreOptions extends Options {
+    canonical?: boolean;
+};
+
+class GMStore<K extends string = string, V extends JSONValue = JSONValue> implements Map<K, V> {}
+class JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {}
 ```
 
 </details>
 
 # EXPORTS
 
-## GMStorage (default)
+## GMStore (default)
 
-- **Alias**: GMStorage, GMStore
+- **Aliases**: GMStore, GMStorage
 
 ### Constructor
 
-- **Type**: `GMStorage<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
+- **Type**: `GMStore<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
 
 ```javascript
 import GMStore from 'gm-storage'
@@ -202,13 +208,13 @@ exception is thrown.
 If the option is false, they are not checked, and access to `GM_*` functions
 required by unused storage methods need not be granted.
 
-## JSONKeyStorage
+## JSONKeyStore
 
-- **Alias**: JSONKeyStorage, JSONKeyStore
+- **Alias**: JSONKeyStorage
 
 ### Constructor
 
-- **Type**: `JSONKeyStorage<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: Options)`
+- **Type**: `JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: Options)`
 
 ```javascript
 import { JSONKeyStore } from 'gm-storage'
@@ -219,11 +225,51 @@ store.set(['foo'], 'bar')
 store.set({ foo: 'bar' }, ['baz', 'quux'])
 store.get(['foo'])        // "bar"
 store.get({ foo: 'bar' }) // ["baz", "quux"]
+Array.from(store.keys())  // [["foo"], { foo: "bar" }]
 ```
 
 This class is an extension of the GMStorage class which supports the automatic
-conversion of keys to/from JSON. Apart from this, its behavior, methods and
-properties are the same as GMStorage.
+conversion of keys to/from JSON. Apart from the options listed below, its
+behavior, methods and properties are the same as GMStorage.
+
+#### Options
+
+The `JSONKeyStore` constructor can take the following options, in addition to
+those supported by GMStorage:
+
+##### canonical
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+```javascript
+const store = new JSONKeyStore({ canonical: true })
+
+store.set({ foo: 'bar', baz: 'quux' }, 1)
+store.set({ baz: 'quux', foo: 'bar' }, 2)
+store.size // 1
+store.get({ foo: 'bar', baz: 'quux' }) // 2
+store.get({ baz: 'quux', foo: 'bar' }) // 2
+```
+
+```javascript
+const store = new JSONKeyStore({ canonical: false })
+
+store.set({ foo: 'bar', baz: 'quux' }, 1)
+store.set({ baz: 'quux', foo: 'bar' }, 2)
+store.size // 2
+store.get({ foo: 'bar', baz: 'quux' }) // 1
+store.get({ baz: 'quux', foo: 'bar' }) // 2
+```
+
+When converting JSON values to strings, JSONKeyStore uses a canonical
+representation which ensures that values which contain (nested) objects have
+the same JSON representation by sorting their keys. This produces the expected
+results, but may have a performance impact (e.g. on my system, it's around 6x
+slower than vanilla `JSON.stringify`). In cases where this normalization isn't
+needed — e.g. where the keys are known to not contain objects (with multiple
+keys), or where the order is stable, or significant — it can be disabled by
+setting this option to false.
 
 ### Methods
 

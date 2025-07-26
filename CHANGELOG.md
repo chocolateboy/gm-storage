@@ -1,3 +1,8 @@
+## 4.1.0 - TBD
+
+- add a `canonical` option to JSONKeyStore to allow normalization (i.e. sorting
+  object keys) to be disabled.
+
 ## 4.0.1 - 2025-07-26
 
 - add missing UMD builds

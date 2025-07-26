@@ -5,7 +5,7 @@ import pkg     from './package.json' with { type: 'json' }
 
 const ENTRY = './src/index.ts'
 const UMD_NAME = 'GMStorage'
-const PRESERVE_NAMES = ['GMStorage']
+const PRESERVE_NAMES = ['GMStorage', 'GMStorageBase', 'JSONKeyStore']
 
 const isDev = process.env.NODE_ENV !== 'production'
 const banner = `/* ${pkg.name} ${pkg.version}. @copyright 2020 ${pkg.author}. @license ${pkg.license} */`

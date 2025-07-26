@@ -1,4 +1,10 @@
-import { type JSONValue } from './util.js'
+export type JSONValue =
+    | null
+    | boolean
+    | number
+    | string
+    | JSONValue[]
+    | { [key: string]: JSONValue };
 
 export type Callback<K extends JSONValue, V extends JSONValue, U> = (
     this: U | undefined,
@@ -7,14 +13,15 @@ export type Callback<K extends JSONValue, V extends JSONValue, U> = (
     store: GMStorageBase<K, V>
 ) => void;
 
-export type Options = {
+export interface Options {
     strict?: boolean;
 };
 
 // these are defined as globals in @types/tampermonkey
 const GM_API_KEYS = ['GM_deleteValue', 'GM_getValue', 'GM_listValues', 'GM_setValue'] as const
 const NOT_FOUND = Symbol()
-const OPTIONS = { strict: true }
+
+export const OPTIONS = { strict: true }
 
 abstract class GMStorageBase<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {
     constructor (options: Options = OPTIONS) {
