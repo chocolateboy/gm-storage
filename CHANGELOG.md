@@ -1,4 +1,4 @@
-## 4.0.1 - TBD
+## 4.0.1 - 2025-07-26
 
 - add missing UMD builds
 
