@@ -23,7 +23,7 @@
         "test:run": "ava --verbose --serial \"./test/**/*.js\""
     },
     "files": [
-        "dist/*.{cjs,mjs,d.ts}"
+        "dist/*.{js,cjs,mjs,d.ts}"
     ],
     "exports": {
         "./package.json": "./package.json",

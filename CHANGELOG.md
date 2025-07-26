@@ -1,3 +1,7 @@
+## 4.0.1 - TBD
+
+- add missing UMD builds
+
 ## 4.0.0 - 2025-07-26
 
 ### Breaking changes
