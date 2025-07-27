@@ -4,6 +4,7 @@ import size    from 'rollup-plugin-filesize'
 import pkg     from './package.json' with { type: 'json' }
 
 const ENTRY = './src/index.ts'
+const MINIFY = ['gm-storage', 'json-key-store']
 const UMD_NAME = 'GMStorage'
 const PRESERVE_NAMES = ['GMStorage', 'GMStorageBase', 'JSONKeyStore']
 
@@ -29,8 +30,10 @@ const cjs = {
     plugins: [$esbuild],
     output: {
         banner,
-        file: 'dist/index.cjs',
+        dir: 'dist/cjs',
+        entryFileNames: '[name].cjs',
         format: 'cjs',
+        preserveModules: true,
         sourcemap: isDev,
     },
 }
@@ -40,8 +43,10 @@ const esm = {
     plugins: [$esbuild],
     output: {
         banner,
-        file: 'dist/index.mjs',
+        dir: 'dist/esm',
+        entryFileNames: '[name].mjs',
         format: 'esm',
+        preserveModules: true,
         sourcemap: isDev,
     }
 }
@@ -52,13 +57,13 @@ const bundle = {
     output: [
         {
             banner,
-            file: 'dist/index.umd.js',
+            file: 'dist/umd/index.umd.js',
             format: 'umd',
             name: UMD_NAME,
         },
         {
             banner,
-            file: 'dist/index.umd.min.js',
+            file: 'dist/umd/index.umd.min.js',
             format: 'umd',
             name: UMD_NAME,
             plugins: [$terser, $size],
@@ -67,6 +72,17 @@ const bundle = {
     ]
 }
 
-const config = isDev ? [cjs] : [cjs, esm, bundle]
+// these are just for information: they're not packaged
+const minified = MINIFY.map(name => ({
+    input: `src/${name}.ts`,
+    plugins: [$esbuild],
+    output: {
+        file: `dist/data/${name}.esm.min.js`,
+        format: 'esm',
+        plugins: [$terser, $size],
+    }
+}))
+
+const config = isDev ? [cjs, ...minified] : [cjs, esm, bundle]
 
 export default config

@@ -6,7 +6,7 @@
         "baseUrl": "./",
         "checkJs": false,
         "declaration": true,
-        "declarationDir": "./dist",
+        "declarationDir": "./dist/types",
         "declarationMap": false,
         "downlevelIteration": true,
         "emitDeclarationOnly": true,

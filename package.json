@@ -2,11 +2,11 @@
     "name": "gm-storage",
     "version": "4.0.1",
     "description": "An ES6 Map wrapper for the synchronous userscript storage API",
-    "main": "dist/index.cjs",
-    "module": "dist/index.mjs",
-    "unpkg": "dist/index.umd.min.js",
-    "jsdelivr": "dist/index.umd.min.js",
-    "types": "dist/index.d.ts",
+    "main": "dist/cjs/index.cjs",
+    "module": "dist/esm/index.mjs",
+    "unpkg": "dist/umd/index.umd.min.js",
+    "jsdelivr": "dist/umd/index.umd.min.js",
+    "types": "dist/types/index.d.ts",
     "repository": "https://github.com/chocolateboy/gm-storage",
     "author": "chocolateboy",
     "license": "MIT",
@@ -22,15 +22,13 @@
         "test": "run-s build test:run",
         "test:run": "ava --verbose --serial \"./test/**/*.js\""
     },
-    "files": [
-        "dist/*.{js,cjs,mjs,d.ts}"
-    ],
+    "files": ["dist"],
     "exports": {
         "./package.json": "./package.json",
         ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.cjs"
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/esm/index.mjs",
+            "require": "./dist/cjs/index.cjs"
         }
     },
     "browserslist": "maintained node versions",
