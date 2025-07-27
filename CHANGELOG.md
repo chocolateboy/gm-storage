@@ -1,4 +1,4 @@
-## 4.1.0 - TBD
+## 4.1.0 - 2025-07-27
 
 - add a `canonical` option to JSONKeyStore to allow normalization (i.e. sorting
   object keys) to be disabled.
