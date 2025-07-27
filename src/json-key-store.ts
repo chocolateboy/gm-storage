@@ -32,10 +32,10 @@ const canonicalize = (_key: string, value: JSONValue) => {
 }
 
 const { parse } = JSON as {
-    parse <K extends JSONValue>(key: string): K;
+    parse <T extends JSONValue = JSONValue>(key: string): T;
 }
 
-export const stringify = <K extends JSONValue>(value: K): string => JSON.stringify(value, canonicalize)
+export const stringify = <T extends JSONValue = JSONValue>(value: T): string => JSON.stringify(value, canonicalize)
 
 export class JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> extends GMStorageBase<K, V> {
     protected stringify: (value: K) => string;

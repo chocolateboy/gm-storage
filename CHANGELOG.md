@@ -1,3 +1,7 @@
+## 4.1.1 - TBD
+
+- documentation fix
+
 ## 4.1.0 - 2025-07-27
 
 - add a `canonical` option to JSONKeyStore to allow normalization (i.e. sorting

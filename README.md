@@ -12,7 +12,7 @@
 - [DESCRIPTION](#description)
 - [TYPES](#types)
 - [EXPORTS](#exports)
-  - [GMStore (default)](#gmstore-default)
+  - [GMStorage (default)](#gmstorage-default)
     - [Constructor](#constructor)
       - [Options](#options)
         - [strict](#strict)
@@ -88,9 +88,9 @@ store.delete('alpha')                      // true
 store.size                                 // 2
 
 // iterables
-[...store.keys()]                   // [["foo"], ["baz"]]
-[...store.values()]                 // ["bar", "quux"]
-Object.fromEntries(store.entries()) // { foo: "bar", baz: "quux" }
+[...store.keys()]         // ["foo", "baz"]
+[...store.values()]       // ["bar", "quux"]
+Object.fromEntries(store) // { foo: "bar", baz: "quux" }
 ```
 
 # DESCRIPTION
@@ -145,7 +145,7 @@ interface JSONKeyStoreOptions extends Options {
     canonical?: boolean;
 };
 
-class GMStore<K extends string = string, V extends JSONValue = JSONValue> implements Map<K, V> {}
+class GMStorage<K extends string = string, V extends JSONValue = JSONValue> implements Map<K, V> {}
 class JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {}
 ```
 
@@ -153,13 +153,13 @@ class JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONVa
 
 # EXPORTS
 
-## GMStore (default)
+## GMStorage (default)
 
 - **Aliases**: GMStore, GMStorage
 
 ### Constructor
 
-- **Type**: `GMStore<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
+- **Type**: `GMStorage<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
 
 ```javascript
 import GMStore from 'gm-storage'
@@ -167,8 +167,7 @@ import GMStore from 'gm-storage'
 const store = new GMStore()
 
 store.setAll([['foo', 'bar'], ['baz', 'quux']])
-
-console.log(store.size) // 2
+store.size // 2
 ```
 
 Constructs a Map-compatible instance which associates keys with their
@@ -214,7 +213,7 @@ required by unused storage methods need not be granted.
 
 ### Constructor
 
-- **Type**: `JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: Options)`
+- **Type**: `JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: JSONKeyStoreOptions)`
 
 ```javascript
 import { JSONKeyStore } from 'gm-storage'
@@ -264,12 +263,13 @@ store.get({ baz: 'quux', foo: 'bar' }) // 2
 
 When converting JSON values to strings, JSONKeyStore uses a canonical
 representation which ensures that values which contain (nested) objects have
-the same JSON representation by sorting their keys. This produces the expected
-results, but may have a performance impact (e.g. on my system, it's around 6x
-slower than vanilla `JSON.stringify`). In cases where this normalization isn't
-needed — e.g. where the keys are known to not contain objects (with multiple
-keys), or where the order is stable, or significant — it can be disabled by
-setting this option to false.
+the same JSON representation regardless of their order of construction (by
+sorting the keys). This produces the expected results, but may have a
+performance impact (e.g. on my system, it's around 6x slower than vanilla
+`JSON.stringify`). In cases where this normalization isn't needed — e.g. where
+the keys are known to not contain objects (with multiple keys), or where the
+order is stable, or significant — it can be disabled by setting this option to
+false.
 
 ### Methods
 
