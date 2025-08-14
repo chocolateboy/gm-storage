@@ -1,4 +1,4 @@
-## 4.1.1 - TBD
+## 4.1.1 - 2025-08-15
 
 - documentation fix
 
