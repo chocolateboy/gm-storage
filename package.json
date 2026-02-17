@@ -13,7 +13,7 @@
     "scripts": {
         "build": "rollup -c --exports named --no-externalLiveBindings --no-treeshake.moduleSideEffects",
         "build:doc": "toc-md README.md",
-        "build:dts": "tsc --declaration --emitDeclarationOnly --noImplicitAny --noUnusedLocals --noUnusedParameters --strict",
+        "build:dts": "tsgo --declaration --emitDeclarationOnly --noImplicitAny --noUnusedLocals --noUnusedParameters --strict",
         "build:release": "cross-env NODE_ENV=production run-s build:dts build build:doc",
         "clean": "shx rm -rf dist",
         "coverage": "nyc ava --verbose --serial \"./test/**/*.js\"",
@@ -22,7 +22,9 @@
         "test": "run-s build test:run",
         "test:run": "ava --verbose --serial \"./test/**/*.js\""
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "exports": {
         "./package.json": "./package.json",
         ".": {
@@ -38,20 +40,22 @@
         ]
     },
     "devDependencies": {
+        "@chocolateboy/toc-md": "^0.5.1",
         "@rollup/plugin-terser": "^0.4.4",
-        "@types/node": "^24.0.10",
-        "@types/tampermonkey": "^5.0.4",
+        "@types/node": "^25.2.3",
+        "@types/tampermonkey": "^5.0.5",
+        "@typescript/native-preview": "7.0.0-dev.20260216.1",
         "ava": "^6.4.1",
-        "cross-env": "^7.0.3",
-        "esbuild": "^0.25.0",
-        "npm-run-all2": "^7.0.2",
+        "cross-env": "^10.1.0",
+        "esbuild": "^0.27.3",
+        "npm-run-all2": "^8.0.4",
         "nyc": "^17.1.0",
-        "rollup": "^4.34.8",
-        "rollup-plugin-esbuild": "^6.1.1",
+        "rollup": "^4.57.1",
+        "rollup-plugin-esbuild": "^6.2.1",
         "rollup-plugin-filesize": "^10.0.0",
-        "shx": "^0.3.4",
-        "toc-md-alt": "^0.4.6",
-        "typescript": "^5.7.3"
+        "shelljs": "^0.10.0",
+        "shx": "^0.4.0",
+        "typescript": "^5.9.3"
     },
     "keywords": [
         "adapter",
