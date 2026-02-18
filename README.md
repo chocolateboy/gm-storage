@@ -535,7 +535,7 @@ The following NPM scripts are available:
 
 ## Libraries
 
-- [Keyv](https://www.npmjs.com/package/keyv) - simple key-value storage with support for multiple backends
+- [@ricann/storage-map](https://www.npmjs.com/package/@ricann/storage-map) - Map wrapper for localStorage and sessionStorage
 
 ## APIs
 
@@ -555,7 +555,7 @@ The following NPM scripts are available:
 
 # COPYRIGHT AND LICENSE
 
-Copyright © 2020-2025 by chocolateboy.
+Copyright © 2020-2026 by chocolateboy.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the [MIT license](https://opensource.org/licenses/MIT).
