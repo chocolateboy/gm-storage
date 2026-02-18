@@ -1,12 +1,14 @@
 import terser  from '@rollup/plugin-terser'
+import Path    from 'node:path'
 import esbuild from 'rollup-plugin-esbuild'
 import size    from 'rollup-plugin-filesize'
+import $       from 'shelljs'
 import pkg     from './package.json' with { type: 'json' }
 
 const ENTRY = './src/index.ts'
-const MINIFY = ['gm-storage', 'json-key-store']
 const UMD_NAME = 'GMStorage'
-const PRESERVE_NAMES = ['GMStorage', 'GMStorageBase', 'JSONKeyStore']
+const PRESERVE_NAMES = ['BaseGMStore', 'GMStorage', 'GMStore', 'GMStoreBy']
+const MINIFY = $.ls('./src/gm-*.ts').map(it => Path.parse(it).name)
 
 const isDev = process.env.NODE_ENV !== 'production'
 const banner = `/* ${pkg.name} ${pkg.version}. @copyright 2020 ${pkg.author}. @license ${pkg.license} */`
@@ -18,6 +20,7 @@ const $terser = terser({
     ecma: 2015,
     compress: {
         passes: 2,
+        reduce_funcs: false,
     },
     mangle: {
         reserved: PRESERVE_NAMES,
@@ -72,12 +75,12 @@ const bundle = {
     ]
 }
 
-// these are just for information: they're not packaged
+// this is just for information: it's not packaged
 const minified = MINIFY.map(name => ({
-    input: `src/${name}.ts`,
+    input: `./src/${name}.ts`,
     plugins: [$esbuild],
     output: {
-        file: `dist/data/${name}.esm.min.js`,
+        file: `./dist/data/${name}.esm.min.js`,
         format: 'esm',
         plugins: [$terser, $size],
     }

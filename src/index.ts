@@ -1,18 +1,18 @@
-export {
-    GMStorage,
-    GMStorage as default,
-    GMStorage as GMStore
-} from './gm-storage.js'
-
 export type {
     Callback,
     JSONValue,
-    Options
-} from './gm-storage-base.js'
+    Options,
+    Options as GMStoreOptions,
+} from './base-gm-store.js'
 
 export {
-    JSONKeyStore,
-    JSONKeyStore as JSONKeyStorage,
-    type JSONKeyStoreOptions,
-    type JSONKeyStoreOptions as JSONKeyStorageOptions
-} from './json-key-store.js'
+    GMStore,
+    GMStore as default,
+    GMStore as GMStorage
+} from './gm-store.js'
+
+export {
+    GMStoreBy,
+    type GMStoreByOptions,
+    type Key,
+} from './gm-store-by.js'

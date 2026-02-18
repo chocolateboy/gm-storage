@@ -12,28 +12,29 @@
 - [DESCRIPTION](#description)
 - [TYPES](#types)
 - [EXPORTS](#exports)
-  - [GMStorage (default)](#gmstorage-default)
-    - [Constructor](#constructor)
-      - [Options](#options)
-        - [strict](#strict)
-  - [JSONKeyStore](#jsonkeystore)
-    - [Constructor](#constructor-1)
-      - [Options](#options-1)
-        - [canonical](#canonical)
+  - [GMStore (default)](#gmstore)
+    - [Options](#options)
+      - [strict](#strict)
     - [Methods](#methods)
       - [clear](#clear)
       - [delete](#delete)
       - [entries](#entries)
       - [forEach](#foreach)
       - [get](#get)
+      - [getOrInsert](#getorinsert)
+      - [getOrInsertComputed](#getorinsertcomputed)
       - [has](#has)
       - [keys](#keys)
+      - [remove](#remove)
       - [set](#set)
       - [setAll](#setall)
       - [values](#values)
+      - [Symbol.iterator](#symboliterator)
     - [Properties](#properties)
       - [size](#size)
-      - [Symbol.iterator](#symboliterator)
+  - [GMStoreBy](#gmstoreby)
+    - [Options](#gmstoreby-options)
+      - [key](#key)
 - [DEVELOPMENT](#development)
 - [COMPATIBILITY](#compatibility)
 - [SEE ALSO](#see-also)
@@ -52,8 +53,9 @@ gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 # FEATURES
 
 - implements the full Map API with some helpful extras
+- support for automatic key translation (e.g. to/from JSON)
 - no dependencies
-- &lt; 600 B minified + gzipped
+- ~1.3 KB minified (~600 B minified + gzipped)
 - fully typed (TypeScript)
 - CDN builds (UMD) - [jsDelivr][], [unpkg][]
 
@@ -76,7 +78,7 @@ $ npm install gm-storage
 // @grant    GM_setValue
 // ==/UserScript==
 
-const store = new GMStorage()
+const store = new GMStore()
 
 // now access userscript storage with the ES6 Map API
 
@@ -88,7 +90,7 @@ store.delete('alpha')                      // true
 store.size                                 // 2
 
 // iterables
-[...store.keys()]         // ["foo", "baz"]
+store.keys().toArray()    // ["foo", "baz"]
 [...store.values()]       // ["bar", "quux"]
 Object.fromEntries(store) // { foo: "bar", baz: "quux" }
 ```
@@ -117,7 +119,7 @@ moved exclusively to the asynchronous API.
 
 # TYPES
 
-The following types are referenced in the descriptions below:
+The following types are exported and referenced in the descriptions below:
 
 <details>
 
@@ -130,36 +132,36 @@ type JSONValue =
     | JSONValue[]
     | { [key: string]: JSONValue };
 
-type Callback<K extends JSONValue, V extends JSONValue, U> = (
-    this: U | undefined,
+type Callback<Store extends Map<K, V>, K, V extends JSONValue, This> = (
+    this: This,
     value: V,
     key: K,
-    store: GMStorage<K, V>
+    store: Store
 ) => void;
+
+type Key<K> {
+    parse: (value: string) => K;
+    stringify: (key: K) => string;
+}
 
 interface Options {
     strict?: boolean;
-};
+}
 
-interface JSONKeyStoreOptions extends Options {
-    canonical?: boolean;
-};
-
-class GMStorage<K extends string = string, V extends JSONValue = JSONValue> implements Map<K, V> {}
-class JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue> implements Map<K, V> {}
+interface GMStoreByOptions<K> extends Options {
+    key: Key<K>;
+}
 ```
 
 </details>
 
 # EXPORTS
 
-## GMStorage (default)
+<a name="gmstore"></a>
+## GMStore (default)
 
-- **Aliases**: GMStore, GMStorage
-
-### Constructor
-
-- **Type**: `GMStorage<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
+- **Type**: `new GMStore<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
+- **Aliases**: default, GMStorage
 
 ```javascript
 import GMStore from 'gm-storage'
@@ -171,28 +173,32 @@ store.size // 2
 ```
 
 Constructs a Map-compatible instance which associates keys with their
-corresponding values in the userscript engine's storage. `GMStorage<K, V>`
-instances are compatible with `Map<K, V>`, where `K` extends (and defaults to)
-string and `V` extends (and defaults to) the type of JSON-serializable values.
+corresponding values in the userscript engine's storage. `GMStore<K, V>`
+instances are compatible with `Map<K, V>`, where `K` extends and defaults to
+string and `V` extends and defaults to the type of JSON-serializable values.
 
-#### Options
+Non-string (e.g. JSON-serializable) keys can be used via
+[GMStoreBy](#gmstoreby), which supports a converter ([`key`](#key)) which
+transparently translates the key type to/from strings.
 
-The `GMStorage` constructor can take the following options:
+### Options
 
-##### strict
+The `GMStore` constructor can take the following options:
+
+#### strict
 
 - **Type**: `boolean`
 - **Default**: `true`
 
 ```javascript
 // don't need GM_deleteValue or GM_listValues
-const store = new GMStorage({ strict: false })
+const store = new GMStore({ strict: false })
 
 store.set('foo', 'bar')
 store.get('foo') // "bar"
 ```
 
-In order to use *all* GMStorage methods, the following `GM_*` functions must be
+In order to use *all* GMStore methods, the following `GM_*` functions must be
 defined (i.e. [granted](https://wiki.greasespot.net/@grant)):
 
   - `GM_deleteValue`
@@ -207,70 +213,6 @@ exception is thrown.
 If the option is false, they are not checked, and access to `GM_*` functions
 required by unused storage methods need not be granted.
 
-## JSONKeyStore
-
-- **Alias**: JSONKeyStorage
-
-### Constructor
-
-- **Type**: `JSONKeyStore<K extends JSONValue = JSONValue, V extends JSONValue = JSONValue>(options?: JSONKeyStoreOptions)`
-
-```javascript
-import { JSONKeyStore } from 'gm-storage'
-
-const store = new JSONKeyStore()
-
-store.set(['foo'], 'bar')
-store.set({ foo: 'bar' }, ['baz', 'quux'])
-store.get(['foo'])        // "bar"
-store.get({ foo: 'bar' }) // ["baz", "quux"]
-Array.from(store.keys())  // [["foo"], { foo: "bar" }]
-```
-
-This class is an extension of the GMStorage class which supports the automatic
-conversion of keys to/from JSON. Apart from the options listed below, its
-behavior, methods and properties are the same as GMStorage.
-
-#### Options
-
-The `JSONKeyStore` constructor can take the following options, in addition to
-those supported by GMStorage:
-
-##### canonical
-
-- **Type**: `boolean`
-- **Default**: `true`
-
-```javascript
-const store = new JSONKeyStore({ canonical: true })
-
-store.set({ foo: 'bar', baz: 'quux' }, 1)
-store.set({ baz: 'quux', foo: 'bar' }, 2)
-store.size // 1
-store.get({ foo: 'bar', baz: 'quux' }) // 2
-store.get({ baz: 'quux', foo: 'bar' }) // 2
-```
-
-```javascript
-const store = new JSONKeyStore({ canonical: false })
-
-store.set({ foo: 'bar', baz: 'quux' }, 1)
-store.set({ baz: 'quux', foo: 'bar' }, 2)
-store.size // 2
-store.get({ foo: 'bar', baz: 'quux' }) // 1
-store.get({ baz: 'quux', foo: 'bar' }) // 2
-```
-
-When converting JSON values to strings, JSONKeyStore uses a canonical
-representation which ensures that values which contain (nested) objects have
-the same JSON representation regardless of their order of construction (by
-sorting the keys). This produces the expected results, but may have a
-performance impact (e.g. on my system, it's around 6x slower than vanilla
-`JSON.stringify`). In cases where this normalization isn't needed — e.g. where
-the keys are known to not contain objects (with multiple keys), or where the
-order is stable, or significant — it can be disabled by setting this option to
-false.
-
 ### Methods
 
 #### clear
@@ -279,7 +221,7 @@ false.
 - **Requires**: `GM_deleteValue`, `GM_listValues`
 
 ```javascript
-const store = new GMStorage().setAll([['foo', 'bar'], ['baz', 'quux']])
+const store = new GMStore().setAll([['foo', 'bar'], ['baz', 'quux']])
 
 store.size    // 2
 store.clear()
@@ -294,7 +236,7 @@ Remove all entries from the store.
 - **Requires**: `GM_deleteValue`, `GM_getValue`
 
 ```javascript
-const store = new GMStorage().setAll([['foo', 'bar'], ['baz', 'quux']])
+const store = new GMStore().setAll([['foo', 'bar'], ['baz', 'quux']])
 
 store.size           // 2
 store.delete('nope') // false
@@ -308,7 +250,7 @@ value existed, false otherwise.
 
 #### entries
 
-- **Type**: `entries(): Generator<[K, V]>`
+- **Type**: `entries(): MapIterator<[K, V]>`
 - **Requires**: `GM_getValue`, `GM_listValues`
 - **Alias**: [`Symbol.iterator`](#symboliterator)
 
@@ -323,8 +265,8 @@ Returns an iterable which yields each key/value pair from the store.
 #### forEach
 
 - **Type**:
-  - `forEach<U>(callback: Callback<K, V, U>, thisArg: U): void`
-  - `forEach(callback: Callback<K, V, undefined>): void`
+  - `forEach<U>(callback: Callback<this, K, V, U>, thisArg: U): void`
+  - `forEach(callback: Callback<this, K, V, undefined>): void`
 - **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
@@ -352,6 +294,38 @@ const age = store.get('age', 42)
 Returns the value corresponding to the supplied key, or the default value
 (which is undefined by default) if it doesn't exist.
 
+#### getOrInsert
+
+- **Type**: `getOrInsert(key: K, defaultValue: V): V`
+- **Requires**: `GM_getValue`, `GM_setValue`
+
+```javascript
+store.get('age')             // undefined
+store.getOrInsert('age', 42) // 42
+store.get('age')             // 42
+```
+
+Returns the value corresponding to the supplied key, or sets and returns the
+supplied value if it doesn't exist.
+
+#### getOrInsertComputed
+
+- **Type**: `getOrInsertComputed(key: K, callback: (key: K) => V): V`
+- **Requires**: `GM_getValue`, `GM_setValue`
+
+```javascript
+store.get('age')                                      // undefined
+store.getOrInsertComputed('age', () => 42)            // 42
+store.get('age')                                      // 42
+
+store.get('value')                                    // undefined
+store.getOrInsertComputed('value', key => key.length) // 5
+store.get('value')                                    // 5
+```
+
+Returns the value corresponding to the supplied key, or sets and returns the
+value returned by the supplied callback if it doesn't exist.
+
 #### has
 
 - **Type**: `has(key: K): boolean`
@@ -368,7 +342,7 @@ otherwise.
 
 #### keys
 
-- **Type**: `keys(): Generator<K>`
+- **Type**: `keys(): MapIterator<K>`
 - **Requires**: `GM_listValues`
 
 ```javascript
@@ -381,6 +355,26 @@ Returns an iterable collection of the store's keys.
 
 Note that, for compatibility with `Map#keys`, the return value is iterable but
 is *not* an array.
+
+#### remove
+
+- **Type**: `remove(key: K): void`
+- **Requires**: `GM_deleteValue`
+
+```javascript
+const store = new GMStore().setAll([['foo', 'bar'], ['baz', 'quux']])
+
+store.size          // 2
+store.has('foo')    // true
+store.remove('foo') // undefined
+store.has('foo')    // false
+store.size          // 1
+```
+
+Delete the value with the specified key from the store.
+
+This performs the same operation as [`delete`](#delete), but without the extra
+step of determining whether the value exists.
 
 #### set
 
@@ -410,7 +404,7 @@ Add entries (key/value pairs) to the store. Returns the store for chaining.
 
 #### values
 
-- **Type**: `values(): Generator<V>`
+- **Type**: `values(): MapIterator<V>`
 - **Requires**: `GM_getValue`, `GM_listValues`
 
 ```javascript
@@ -420,6 +414,16 @@ for (const value of store.values()) {
 ```
 
 Returns an iterable collection of the store's values.
+
+#### Symbol.iterator
+
+An alias for [`entries`](#entries):
+
+```javascript
+for (const [key, value] of store) {
+    console.log([key, value])
+}
+```
 
 ### Properties
 
@@ -434,14 +438,69 @@ console.log(store.size)
 
 Returns the number of values in the store.
 
-#### Symbol.iterator
+## GMStoreBy
 
-An alias for [`entries`](#entries):
+- **Type**: `new GMStoreBy<K, V extends JSONValue = JSONValue>(options: GMStoreByOptions<K>)`
+
+A custom version of [GMStore](#gmstore) which supports non-string keys by
+transparently translating them to/from strings via a pair of `parse` and
+`stringify` functions. Apart from the unrestricted key type, its [methods](#methods)
+and [properties](#properties) are the same as those of GMStore.
+
+<a name="gmstoreby-options"></a>
+### Options
+
+The GMStoreBy constructor takes the same [options](#options) as GMStore, along with the
+following (required) option:
+
+#### key
+
+- **Type**: `Key<K>`, required
 
 ```javascript
-for (const [key, value] of store) {
-    console.log([key, value])
-}
+import { GMStoreBy, type JSONValue } from 'gm-storage'
+
+const store = new GMStoreBy<JSONValue>({ key: JSON })
+
+store.set(['foo'], 'bar')
+store.set({ foo: 'bar' }, ['baz', 'quux'])
+store.get(['foo'])        // "bar"
+store.get({ foo: 'bar' }) // ["baz", "quux"]
+store.keys().toArray()    // [["foo"], { foo: "bar" }]
+```
+
+The `key` option is an object which provides an encoder (`stringify`) and
+decoder (`parse`) function to translate keys to/from strings for use in
+the underlying storage.
+
+For example, to serialize keys to canonical JSON (so that e.g. `[{ foo: 42, bar: true }]`
+and `[{ bar: true, foo: 42 }]` are mapped to the same value):
+
+```typescript
+import { GMStoreBy, type JSONValue }  from 'gm-storage'
+import { stringifyCopy as stringify } from 'canonical-json'
+
+const store = new GMStoreBy<JSONValue>({
+    key: { parse: JSON.parse, stringify }
+})
+
+store.set({ foo: 42, bar: true }, 1)
+store.has({ foo: 42, bar: true }) // true
+store.has({ bar: true, foo: 42 }) // true
+```
+
+Any serializer/deserializer can be used (not just JSON), e.g. to support bigint
+keys:
+
+```typescript
+import { GMStoreBy } from 'gm-storage'
+
+const store = new GMStoreBy<bigint, boolean>({
+    key: { parse: BigInt, stringify: String }
+})
+
+store.set(42n, true)
+store.keys().toArray() // [42n]
 ```
 
 # DEVELOPMENT

@@ -16,13 +16,13 @@ const entries = function* () {
     }
 }
 
-const { GMStorage } = require('..')
+const { GMStore } = require('..')
 
 Object.assign(global, API)
 
 test.beforeEach(t => {
     const backingStore = initBackingStore()
-    const store = new GMStorage()
+    const store = new GMStore()
 
     t.is(backingStore.size, 0)
     t.is(store.size, 0)
@@ -35,8 +35,13 @@ test.beforeEach(t => {
 test('clear', t => {
     const { store } = t.context
 
+    for (const key of KEYS) {
+        t.true(store.has(key))
+    }
+
     t.is(store.size, FULL)
     store.clear()
+    t.is(store.size, 0)
 
     for (const key of KEYS) {
         t.false(store.has(key))
@@ -52,8 +57,9 @@ test('delete', t => {
         const key = KEYS[i]
         t.is(store.size, i + 1)
         t.true(store.has(key))
-        store.delete(key)
+        t.is(store.delete(key), true)
         t.false(store.has(key))
+        t.is(store.delete(key), false)
         t.is(store.size, i)
     }
 
@@ -63,10 +69,10 @@ test('delete', t => {
 test('entries', t => {
     const { store } = t.context
 
-    let i = 0
+    let i = -1
 
     for (const entry of store.entries()) {
-        t.deepEqual(entry, ENTRIES[i++])
+        t.deepEqual(entry, ENTRIES[++i])
     }
 
     store.clear()
@@ -82,17 +88,18 @@ test('forEach', t => {
     const seen1 = {}
     const seen2 = {}
 
-    store.forEach(function (value, key, _store) {
+    store.forEach(function (value, key, $store) {
         t.is(this, undefined)
-        t.is(_store, store)
+        t.is($store, store)
+        t.true($store instanceof GMStore)
         seen1[key] = value
     })
 
     t.deepEqual(seen1, OBJECT)
 
-    store.forEach(function (value, key, _store) {
+    store.forEach(function (value, key, $store) {
         t.is(this, $this)
-        t.is(_store, store)
+        t.is($store, store)
         seen2[key] = value
     }, $this)
 
@@ -109,6 +116,44 @@ test('get', t => {
         t.is(store.get(key), value)
         t.is(store.get(key, $default), value)
     }
+})
+
+test('getOrInsert', t => {
+    const { store } = t.context
+    const $default = Symbol('default')
+
+    for (const [key, value] of ENTRIES) {
+        const newKey = key.toUpperCase()
+        const newValue = value ** 2
+
+        t.is(store.getOrInsert(key, $default), value)
+        t.is(store.getOrInsert(newKey, newValue), newValue)
+        t.is(store.getOrInsert(newKey, $default), newValue)
+        t.is(store.getOrInsert(key, $default), value)
+    }
+
+    t.is(store.size, FULL * 2)
+})
+
+test('getOrInsertComputed', t => {
+    const { store } = t.context
+    const $default = Symbol('default')
+    const fail = t.fail.bind(t)
+
+    for (const [key, value] of ENTRIES) {
+        const newKey = key.toUpperCase()
+        const newValue = value ** 2
+
+        t.is(store.getOrInsertComputed(key, fail), value)
+        t.is(store.getOrInsertComputed(newKey, () => newValue), newValue)
+        t.is(store.getOrInsertComputed(newKey, fail), newValue)
+        t.is(store.delete(newKey), true)
+        t.is(store.getOrInsertComputed(newKey, key => key), newKey)
+        t.is(store.getOrInsertComputed(newKey, fail), newKey)
+        t.is(store.getOrInsertComputed(key, fail), value)
+    }
+
+    t.is(store.size, FULL * 2)
 })
 
 test('has', t => {
@@ -141,6 +186,23 @@ test('keys', t => {
     }
 })
 
+test('remove', t => {
+    const { store } = t.context
+
+    t.is(store.size, FULL)
+
+    for (let i = FULL - 1; i >= 0; --i) {
+        const key = KEYS[i]
+        t.is(store.size, i + 1)
+        t.true(store.has(key))
+        store.remove(key)
+        t.false(store.has(key))
+        t.is(store.size, i)
+    }
+
+    t.is(store.size, 0)
+})
+
 test('set', t => {
     const { store } = t.context
 
@@ -166,14 +228,6 @@ test('set', t => {
 
 test('setAll', t => {
     const { store } = t.context
-    const values1 = [['foo', 'bar'], ['baz', 'quux']]
-
-    const values2 = function* () {
-        yield ['foo', 1]
-        yield ['bar', 2]
-        yield ['baz', 3]
-        yield ['quux', 4]
-    }
 
     store.clear()
 
@@ -211,6 +265,8 @@ test('size', t => {
         store.set(key, value)
         t.is(store.size, i + 1)
     }
+
+    t.is(store.size, FULL)
 })
 
 test('values', t => {
@@ -230,6 +286,27 @@ test('values', t => {
     }
 })
 
+test('Symbol.iterator', t => {
+    const { store } = t.context
+
+    let i = -1
+
+    for (const entry of store) {
+        t.deepEqual(entry, ENTRIES[++i])
+    }
+
+    store.clear()
+
+    for (const entry of store) {
+        t.fail()
+    }
+})
+
+test('Symbol.toStringTag', t => {
+    const { store } = t.context
+    t.is({}.toString.call(store), '[object GMStore]')
+})
+
 test('options.strict', t => {
     const oldGetValue = global.GM_getValue
 
@@ -240,28 +317,28 @@ test('options.strict', t => {
 
         t.is(global.GM_getValue, undefined)
 
-        t.notThrows(() => new GMStorage({ strict: false }))
+        t.notThrows(() => new GMStore({ strict: false }))
 
-        t.throws(() => new GMStorage({ strict: true }), {
+        t.throws(() => new GMStore({ strict: true }), {
             instanceOf: ReferenceError,
             message: /GM_getValue is not defined/,
         })
 
-        t.throws(() => new GMStorage(), {
+        t.throws(() => new GMStore(), {
             instanceOf: ReferenceError,
             message: /GM_getValue is not defined/,
         })
 
         global.GM_getValue = 42
 
-        t.notThrows(() => new GMStorage({ strict: false }))
+        t.notThrows(() => new GMStore({ strict: false }))
 
-        t.throws(() => new GMStorage({ strict: true }), {
+        t.throws(() => new GMStore({ strict: true }), {
             instanceOf: TypeError,
             message: /GM_getValue is not a function/,
         })
 
-        t.throws(() => new GMStorage(), {
+        t.throws(() => new GMStore(), {
             instanceOf: TypeError,
             message: /GM_getValue is not a function/,
         })

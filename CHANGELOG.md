@@ -1,3 +1,43 @@
+## 5.0.0 - TBD
+
+### Breaking changes
+
+- Replace JSONKeyStore with a new class/export, GMStoreBy, which takes a key
+  translator (parse/stringify functions), leaving the implementation up to the
+  user, e.g.:
+
+before:
+
+```typescript
+    import { JSONKeyStorage } from 'gm-storage'
+
+    const store = new JSONKeyStorage({ canonicalize: true })
+    store.set({ foo: 42, bar: true }, 1)
+    store.has({ bar: true, foo: 42 }) // true
+```
+
+after:
+
+```typescript
+    import { GMStoreBy }                  from 'gm-storage'
+    import { stringifyCopy as stringify } from 'canonical-json'
+
+    const store = new GMStoreBy({ key: { parse: JSON.parse, stringify } })
+    store.set({ foo: 42, bar: true }, 1)
+    store.has({ bar: true, foo: 42 }) // true
+```
+
+### Features
+
+- add ES2026 `getOrInsert` and `getOrInsertedComputed` methods
+- add a `remove` method, which directly calls `GM_deleteValue` without checking
+  if the value exists
+
+### Changes
+
+- bump dependencies
+- update build
+
 ## 4.1.1 - 2025-08-15
 
 - documentation fix
@@ -49,14 +89,14 @@
 
 - keys are stored and retrieved as JSON values rather than strings:
 
-    before:
+before:
 
 ```javascript
         store.set(JSON.stringify(['foo']), 'bar')
         store.get(JSON.stringify(['foo'])) // "bar"
 ```
 
-    after:
+after:
 
 ```javascript
         store.set(['foo'], "bar")
