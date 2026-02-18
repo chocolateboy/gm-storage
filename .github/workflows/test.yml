@@ -23,7 +23,7 @@ jobs:
 
   test:
     needs: skip-duplicate-runs
-    if: ${{ needs.skip-duplicate-runs.outputs.should_skip != 'true' }}
+    if: needs.skip-duplicate-runs.outputs.should_skip != 'true'
     name: 'node v${{ matrix.node-version }} on ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}
 
@@ -34,15 +34,15 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: install pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        uses: pnpm/action-setup@v4
         with:
           version: latest
 
       - name: set up node v${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
@@ -51,4 +51,4 @@ jobs:
         run: pnpm install --prefer-offline --frozen-lockfile
 
       - name: test
-        run: pnpm test
+        run: pnpm run prepublishOnly
