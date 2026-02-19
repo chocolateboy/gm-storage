@@ -1,3 +1,37 @@
+## 5.1.0 - TBD
+
+### Features
+
+- `remove` returns the store for chaining (rather than void)
+
+    before:
+
+    ```javascript
+    store.remove('foo')
+    store.remove('bar')
+    ```
+
+    after:
+
+    ```javascript
+    store.remove('foo').remove('bar')
+    ```
+
+- add `removeAll` to remove multiple keys in one go
+
+    before:
+
+    ```javascript
+    store.remove('foo')
+    store.remove('bar')
+    ```
+
+    after:
+
+    ```javascript
+    store.removeAll(['foo', 'bar'])
+    ```
+
 ## 5.0.0 - 2026-02-18
 
 ### Breaking changes
@@ -6,30 +40,30 @@
   translator (parse/stringify functions), leaving the implementation up to the
   user, e.g.:
 
-before:
+    before:
 
-```typescript
+    ```javascript
     import { JSONKeyStorage } from 'gm-storage'
 
     const store = new JSONKeyStorage({ canonicalize: true })
     store.set({ foo: 42, bar: true }, 1)
     store.has({ bar: true, foo: 42 }) // true
-```
+    ```
 
-after:
+    after:
 
-```typescript
+    ```javascript
     import { GMStoreBy }                  from 'gm-storage'
     import { stringifyCopy as stringify } from 'canonical-json'
 
     const store = new GMStoreBy({ key: { parse: JSON.parse, stringify } })
     store.set({ foo: 42, bar: true }, 1)
     store.has({ bar: true, foo: 42 }) // true
-```
+    ```
 
 ### Features
 
-- add ES2026 `getOrInsert` and `getOrInsertedComputed` methods
+- add ES2026 [`getOrInsert`][getOrInsert] and [`getOrInsertComputed`][getOrInsertComputed] methods
 - add a `remove` method, which directly calls `GM_deleteValue` without checking
   if the value exists
 
@@ -58,28 +92,28 @@ after:
 - restore string keys for the default GMStorage export, and add the JSON-key
   variant (JSONKeyStorage) as a separate export:
 
-```javascript
+    ```javascript
     import GMStorage from 'gm-storage'
     import { JSONKeyStorage } from 'gm-storage'
 
     const stringKeyStore = new GMStorage()
     const jsonKeyStore = new JSONKeyStorage()
-```
+    ```
 
-  this is a breaking change (again) as the extra export means an unnamed export
-  can no longer be used in CommonJS, i.e. `require`s which could previously be
-  written as:
+    this is a breaking change (again) as the extra export means an unnamed export
+    can no longer be used in CommonJS, i.e. `require`s which could previously be
+    written as:
 
-```javascript
-   const GMStore = require('gm-storage')
-```
+    ```javascript
+    const GMStore = require('gm-storage')
+    ```
 
-  now need to specify the name, e.g.:
+    now need to specify the name, e.g.:
 
-```javascript
+    ```javascript
     const GMStorage = require('gm-storage').default
     const { GMStorage } = require('gm-storage')
-```
+    ```
 
 ## 3.0.0 - 2025-07-25
 
@@ -89,19 +123,19 @@ after:
 
 - keys are stored and retrieved as JSON values rather than strings:
 
-before:
+    before:
 
-```javascript
-        store.set(JSON.stringify(['foo']), 'bar')
-        store.get(JSON.stringify(['foo'])) // "bar"
-```
+    ```javascript
+    store.set(JSON.stringify(['foo']), 'bar')
+    store.get(JSON.stringify(['foo'])) // "bar"
+    ```
 
-after:
+    after:
 
-```javascript
-        store.set(['foo'], "bar")
-        store.get(['foo']) // "bar"
-```
+    ```javascript
+    store.set(['foo'], "bar")
+    store.get(['foo']) // "bar"
+    ```
 
 #### Types
 
@@ -186,3 +220,6 @@ after:
 ## 0.0.1 - 2020-05-11
 
 - initial release
+
+[getOrInsert]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Map/getOrInsert
+[getOrInsertComputed]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Map/getOrInsertComputed

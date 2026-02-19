@@ -195,12 +195,23 @@ test('remove', t => {
         const key = KEYS[i]
         t.is(store.size, i + 1)
         t.true(store.has(key))
-        store.remove(key)
+        t.is(store.remove(key), store)
         t.false(store.has(key))
         t.is(store.size, i)
     }
 
     t.is(store.size, 0)
+})
+
+test('removeAll', t => {
+    const { store } = t.context
+
+    t.is(store.size, FULL)
+    t.is(store.removeAll(), store)
+    t.is(store.size, FULL)
+    t.is(store.removeAll(['foo', 'baz']), store)
+    t.is(store.size, FULL - 2)
+    t.deepEqual([...store.keys()], ['bar', 'quux'])
 })
 
 test('set', t => {

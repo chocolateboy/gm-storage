@@ -89,7 +89,15 @@ abstract class BaseGMStore<K, V extends JSONValue = JSONValue> implements Map<K,
 
     public abstract keys(): MapIterator<K>;
 
-    public abstract remove (key: K): void;
+    public abstract remove(key: K): this;
+
+    public removeAll(keys: Iterable<K> = []): this {
+        for (const key of keys) {
+            this.remove(key)
+        }
+
+        return this
+    }
 
     public abstract set(key: K, value: V): this;
 

@@ -32,8 +32,8 @@ class GMStore<K extends string = string, V extends JSONValue = JSONValue> extend
         yield *(GM_listValues() as K[])
     }
 
-    public remove(key: K) {
-        GM_deleteValue(key)
+    public remove(key: K): this {
+        return GM_deleteValue(key), this
     }
 
     public set(key: K, value: V): this {

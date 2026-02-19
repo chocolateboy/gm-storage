@@ -68,8 +68,8 @@ class GMStoreBy<K, V extends JSONValue = JSONValue> extends BaseGMStore<K, V> {
         }
     }
 
-    public remove(key: K): void {
-        this.#store.remove(this.#stringify(key))
+    public remove(key: K): this {
+        return this.#store.remove(this.#stringify(key)), this
     }
 
     public set(key: K, value: V): this {

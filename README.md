@@ -12,7 +12,7 @@
 - [DESCRIPTION](#description)
 - [TYPES](#types)
 - [EXPORTS](#exports)
-  - [GMStore (default)](#gmstore)
+  - [default](#gmstore)
     - [Options](#options)
       - [strict](#strict)
     - [Methods](#methods)
@@ -26,6 +26,7 @@
       - [has](#has)
       - [keys](#keys)
       - [remove](#remove)
+      - [removeAll](#removeall)
       - [set](#set)
       - [setAll](#setall)
       - [values](#values)
@@ -55,7 +56,7 @@ gm-storage - an ES6 Map wrapper for the synchronous userscript storage API
 - implements the full Map API with some helpful extras
 - support for automatic key translation (e.g. to/from JSON)
 - no dependencies
-- ~1.3 KB minified (~600 B minified + gzipped)
+- ~600 B minified + gzipped
 - fully typed (TypeScript)
 - CDN builds (UMD) - [jsDelivr][], [unpkg][]
 
@@ -158,10 +159,10 @@ interface GMStoreByOptions<K> extends Options {
 # EXPORTS
 
 <a name="gmstore"></a>
-## GMStore (default)
+## default
 
 - **Type**: `new GMStore<K extends string = string, V extends JSONValue = JSONValue>(options?: Options)`
-- **Aliases**: default, GMStorage
+- **Aliases**: GMStorage, GMStore
 
 ```javascript
 import GMStore from 'gm-storage'
@@ -245,7 +246,7 @@ store.has('foo')     // false
 store.size           // 1
 ```
 
-Delete the value with the specified key from the store. Returns true if the
+Remove the value with the specified key from the store. Returns true if the
 value existed, false otherwise.
 
 #### entries
@@ -358,23 +359,40 @@ is *not* an array.
 
 #### remove
 
-- **Type**: `remove(key: K): void`
+- **Type**: `remove(key: K): this`
 - **Requires**: `GM_deleteValue`
 
 ```javascript
-const store = new GMStore().setAll([['foo', 'bar'], ['baz', 'quux']])
+const store = new GMStore().setAll([['foo', 1], ['bar', 2], ['baz', 3]])
 
-store.size          // 2
+store.size          // 3
 store.has('foo')    // true
-store.remove('foo') // undefined
+store.remove('foo') // store
 store.has('foo')    // false
-store.size          // 1
+store.size          // 2
 ```
 
-Delete the value with the specified key from the store.
+Remove the value with the specified key from the store. Returns the store for chaining.
 
 This performs the same operation as [`delete`](#delete), but without the extra
 step of determining whether the value exists.
+
+#### removeAll
+
+- **Type**: `removeAll(keys?: Iterable<K>): this`
+- **Requires**: `GM_deleteValue`
+
+```javascript
+const store = new GMStore().setAll([['foo', 1], ['bar', 2], ['baz', 3]])
+
+store.size                      // 3
+store.removeAll(['foo', 'baz']) // store
+store.has('foo')                // false
+store.has('baz')                // false
+store.size                      // 1
+```
+
+Remove the values with the specified keys from the store. Returns the store for chaining.
 
 #### set
 
