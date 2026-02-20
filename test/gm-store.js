@@ -315,7 +315,7 @@ test('Symbol.iterator', t => {
 
 test('Symbol.toStringTag', t => {
     const { store } = t.context
-    t.is({}.toString.call(store), '[object GMStore]')
+    t.is({}.toString.call(store), '[object GMStorage]')
 })
 
 test('options.strict', t => {

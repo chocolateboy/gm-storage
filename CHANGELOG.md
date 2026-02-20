@@ -4,29 +4,29 @@
 
 - `remove` returns the store for chaining (rather than void)
 
-    before:
+    **before**:
 
     ```javascript
     store.remove('foo')
-    store.remove('bar')
+    store.set('bar', 42)
     ```
 
-    after:
+    **after**:
 
     ```javascript
-    store.remove('foo').remove('bar')
+    store.remove('foo').set('bar', 42)
     ```
 
 - add `removeAll` to remove multiple keys in one go
 
-    before:
+    **before**:
 
     ```javascript
     store.remove('foo')
     store.remove('bar')
     ```
 
-    after:
+    **after**:
 
     ```javascript
     store.removeAll(['foo', 'bar'])
@@ -40,7 +40,7 @@
   translator (parse/stringify functions), leaving the implementation up to the
   user, e.g.:
 
-    before:
+    **before**:
 
     ```javascript
     import { JSONKeyStorage } from 'gm-storage'
@@ -50,7 +50,7 @@
     store.has({ bar: true, foo: 42 }) // true
     ```
 
-    after:
+    **after**:
 
     ```javascript
     import { GMStoreBy }                  from 'gm-storage'
@@ -123,14 +123,14 @@
 
 - keys are stored and retrieved as JSON values rather than strings:
 
-    before:
+    **before**:
 
     ```javascript
     store.set(JSON.stringify(['foo']), 'bar')
     store.get(JSON.stringify(['foo'])) // "bar"
     ```
 
-    after:
+    **after**:
 
     ```javascript
     store.set(['foo'], "bar")
@@ -167,11 +167,11 @@
   `GMStorage<K extends string = string, V extends Value = Value>` for parity
   with `Map<K, V>`
 
-#### Features
+### Features
 
 - add a `setAll` method to assign multiple key/value pairs in one go
 
-#### Changes
+### Changes
 
 - bump dev dependencies
 - update the build

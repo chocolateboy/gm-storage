@@ -40,7 +40,7 @@ abstract class BaseGMStore<K, V extends JSONValue = JSONValue> implements Map<K,
     }
 
     public get [Symbol.toStringTag](): string {
-        return 'GMStore'
+        return 'GMStorage'
     }
 
     public clear(): void {

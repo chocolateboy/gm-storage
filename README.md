@@ -352,7 +352,7 @@ for (const key of store.keys()) {
 }
 ```
 
-Returns an iterable collection of the store's keys.
+Returns an iterable which yields each key from the store.
 
 Note that, for compatibility with `Map#keys`, the return value is iterable but
 is *not* an array.
@@ -431,7 +431,7 @@ for (const value of store.values()) {
 }
 ```
 
-Returns an iterable collection of the store's values.
+Returns an iterable which yields each value from the store.
 
 #### Symbol.iterator
 
@@ -546,7 +546,7 @@ The following NPM scripts are available:
 - any userscript engine with support for the Greasemonkey 3 storage API
 - any browser with ES6 support
 - the `GM_*` functions are accessed via
-  [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis),
+  [`globalThis`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/globalThis),
   which may need to be polyfilled in older browsers
 
 # SEE ALSO
@@ -561,7 +561,7 @@ The following NPM scripts are available:
 - [GM_getValue](https://sourceforge.net/p/greasemonkey/wiki/GM_getValue/)
 - [GM_listValues](https://sourceforge.net/p/greasemonkey/wiki/GM_listValues/)
 - [GM_setValue](https://sourceforge.net/p/greasemonkey/wiki/GM_setValue/)
-- [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
+- [Map](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Map)
 
 # VERSION
 
