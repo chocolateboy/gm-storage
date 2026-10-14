@@ -386,9 +386,9 @@ step of determining whether the value exists.
 const store = new GMStore().setAll([['foo', 1], ['bar', 2], ['baz', 3]])
 
 store.size                      // 3
-store.removeAll(['foo', 'baz']) // store
+store.removeAll(['foo', 'bar']) // store
 store.has('foo')                // false
-store.has('baz')                // false
+store.has('bar')                // false
 store.size                      // 1
 ```
 
@@ -461,9 +461,9 @@ Returns the number of values in the store.
 - **Type**: `new GMStoreBy<K, V extends JSONValue = JSONValue>(options: GMStoreByOptions<K>)`
 
 A custom version of [GMStore](#gmstore) which supports non-string keys by
-transparently translating them to/from strings via a pair of `parse` and
-`stringify` functions. Apart from the unrestricted key type, its [methods](#methods)
-and [properties](#properties) are the same as those of GMStore.
+transparently translating them to/from strings via a pair of `stringify` and
+`parse` functions. Apart from the unrestricted key type, its
+[methods](#methods) and [properties](#properties) are the same as those of GMStore.
 
 <a name="gmstoreby-options"></a>
 ### Options

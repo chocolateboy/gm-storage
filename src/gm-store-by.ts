@@ -38,7 +38,7 @@ class GMStoreBy<K, V extends JSONValue = JSONValue> extends BaseGMStore<K, V> {
 
         super(options)
 
-        // check will have already been done in the super call if not disabled
+        // check will have already been done in the super call (if not disabled)
         this.#store = new GMStore({ strict: false })
         this.#parse = key.parse
         this.#stringify = key.stringify
@@ -61,10 +61,10 @@ class GMStoreBy<K, V extends JSONValue = JSONValue> extends BaseGMStore<K, V> {
     }
 
     public *keys(): MapIterator<K> {
-        const decode = this.#parse
+        const parse = this.#parse
 
         for (const key of this.#store.keys()) {
-            yield decode(key)
+            yield parse(key)
         }
     }
 
