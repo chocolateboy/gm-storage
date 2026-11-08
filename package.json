@@ -34,11 +34,6 @@
         }
     },
     "browserslist": "maintained node versions",
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "esbuild"
-        ]
-    },
     "devDependencies": {
         "@chocolateboy/toc-md": "^0.7.0",
         "@rollup/plugin-terser": "^1.0.2",
