@@ -1,3 +1,14 @@
+## 5.2.0 - 2026-11-09
+
+### Fixes
+
+- Fix type declaration path
+
+### Changes
+
+- bump dependencies
+- update build
+
 ## 5.1.0 - 2026-02-19
 
 ### Features
